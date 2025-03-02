@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Admin Paneli{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Menü -->
+        <div class="col-md-2 d-md-block sidebar bg-dark p-0">
+            <div class="position-sticky">
+                <ul class="nav flex-column p-3 sidebar-menu">
+                    <li class="nav-item">
+                        <div class="sidebar-header mb-4">
+                            <h4 class="text-light">Admin Paneli</h4>
+                            <div class="border-bottom border-secondary mb-2"></div>
+                        </div>
+                    </li>
+                    <li class="nav-item {% if request.endpoint == 'admin_panel.index' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('admin_panel.index') }}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.endpoint == 'admin_panel.users' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('admin_panel.users') }}">
+                            <i class="fas fa-users"></i>
+                            <span>Kullanıcılar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.endpoint == 'admin_panel.blogs' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('admin_panel.blogs') }}">
+                            <i class="fas fa-blog"></i>
+                            <span>Blog Yazıları</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.endpoint == 'admin_panel.announcements' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('admin_panel.announcements') }}">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Duyurular</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.endpoint == 'admin_panel.courses' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('admin_panel.courses') }}">
+                            <i class="fas fa-book"></i>
+                            <span>Kurslar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.endpoint == 'admin_panel.logs' %}active{% endif %}">
+                        <a class="nav-link" href="{{ url_for('admin_panel.logs') }}">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Sistem Logları</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="border-top border-secondary mt-4 pt-4">
+                            <a href="{{ url_for('main.index') }}" class="btn btn-outline-light btn-sm w-100">
+                                <i class="fas fa-home"></i> Ana Sayfaya Dön
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Ana İçerik Alanı -->
+        <div class="col-md-10 ms-sm-auto px-md-4 py-4 admin-content">
+            {% block admin_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %} 
