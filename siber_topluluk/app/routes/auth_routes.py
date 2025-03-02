@@ -39,10 +39,16 @@ def register():
             elif User.get_by_username(username):
                 error = f"'{username}' kullanıcı adı zaten alınmış."
         
+        # Kullanıcı e-posta adresini kontrol et
+        if email.endswith('@samsun.edu.tr'):
+            role = "member"
+        else:
+            role = "user"
+        
         # Hata yoksa kullanıcıyı oluştur
         if not error:
             # Yeni kullanıcı oluştur
-            new_user = User(username=username, email=email, password=password)
+            new_user = User(username=username, email=email, password=password, role=role)
             new_user.save()
             
             # Kullanıcıyı giriş yap
