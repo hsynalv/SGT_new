@@ -11,6 +11,9 @@ import os
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
 from functools import wraps
+from app.models.activity_log import ActivityLog
+from app.utils.logger import log_user_activity
+from app.utils.log_extension import log_activity
 
 admin_bp = Blueprint('admin_panel', __name__, url_prefix='/admin')
 
@@ -46,12 +49,66 @@ def index():
     # Kurs sayısı
     course_count = len(list(Course.get_all()))
     
-    return render_template('admin/index.html', 
+    # CTF görevi sayısı
+    ctf_challenge_count = mongo.db.ctf_challenges.count_documents({}) if 'ctf_challenges' in mongo.db.list_collection_names() else 0
+    
+    # Güncel zaman
+    now = datetime.now()
+    
+    # Son kullanıcı aktivitelerini al
+    try:
+        # ActivityLog sınıfını kullanma
+        # recent_activities = ActivityLog.get_recent_user_activities(limit=10)
+        
+        # Doğrudan MongoDB sorgusu kullan
+        recent_activities = list(mongo.db.activity_logs.find({"type": "user_action"}).sort("timestamp", -1).limit(10))
+    except Exception as e:
+        print(f"Kullanıcı aktivite hatası: {str(e)}")
+        recent_activities = []
+    
+    # Son admin aktivitelerini al
+    try:
+        # admin_activities = ActivityLog.get_recent_admin_activities(limit=5)
+        
+        # Doğrudan MongoDB sorgusu kullan
+        admin_activities = list(mongo.db.activity_logs.find({"type": "admin_action"}).sort("timestamp", -1).limit(5))
+    except Exception as e:
+        print(f"Admin aktivite hatası: {str(e)}")
+        admin_activities = []
+    
+    # Son hataları al
+    try:
+        # recent_errors = ActivityLog.get_recent_errors(limit=5)
+        
+        # Doğrudan MongoDB sorgusu kullan
+        recent_errors = list(mongo.db.activity_logs.find({"type": "error"}).sort("timestamp", -1).limit(5))
+    except Exception as e:
+        print(f"Hata logları hatası: {str(e)}")
+        recent_errors = []
+    
+    # Log sayılarını hesapla
+    total_logs = mongo.db.activity_logs.count_documents({})
+    
+    # ActivityLog sabitleri yerine string değerler kullan
+    user_logs = mongo.db.activity_logs.count_documents({"type": "user_action"})
+    admin_logs = mongo.db.activity_logs.count_documents({"type": "admin_action"})
+    error_logs = mongo.db.activity_logs.count_documents({"type": "error"})
+    
+    return render_template('admin/index.html',
                            title='Admin Paneli',
                            user_count=user_count,
                            blog_count=blog_count,
                            announcement_count=announcement_count,
-                           course_count=course_count)
+                           course_count=course_count,
+                           ctf_challenge_count=ctf_challenge_count,
+                           now=now,
+                           recent_activities=recent_activities,
+                           admin_activities=admin_activities,
+                           recent_errors=recent_errors,
+                           total_logs=total_logs,
+                           user_logs=user_logs,
+                           admin_logs=admin_logs,
+                           error_logs=error_logs)
 
 @admin_bp.route('/users')
 @login_required
@@ -393,4 +450,74 @@ def course_enrollments(course_id):
     
     return render_template('admin/course_enrollments.html', 
                           course=course, 
-                          enrolled_users=enrolled_users) 
+                          enrolled_users=enrolled_users)
+
+@admin_bp.route('/logs')
+@login_required
+@admin_required
+@log_activity('view', 'Admin log sayfasını görüntüledi', 'admin')
+def logs():
+    """Aktivite loglarını görüntüle"""
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    log_type = request.args.get('type', None)
+    module = request.args.get('module', None)
+    
+    # Toplam log sayılarını hesapla
+    total_logs = mongo.db.activity_logs.count_documents({})
+    user_logs = mongo.db.activity_logs.count_documents({"type": "user_action"})
+    admin_logs = mongo.db.activity_logs.count_documents({"type": "admin_action"})
+    error_logs = mongo.db.activity_logs.count_documents({"type": "error"})
+    security_logs = mongo.db.activity_logs.count_documents({"type": "security_action"})
+    
+    # Log tipine göre filtrele
+    query = {}
+    if log_type:
+        query["type"] = log_type
+    if module:
+        query["module"] = module
+    
+    # Toplam kayıt sayısı
+    total_filtered = mongo.db.activity_logs.count_documents(query)
+    
+    # Sayfalama
+    skip = (page - 1) * per_page
+    
+    # ActivityLog.get_all yerine doğrudan MongoDB sorgusu kullan
+    logs = list(mongo.db.activity_logs.find(query).sort("timestamp", -1).skip(skip).limit(per_page))
+    
+    # Benzersiz modülleri bul
+    modules = mongo.db.activity_logs.distinct("module")
+    
+    # Sayfalama için toplam sayfa sayısını hesapla
+    total_pages = (total_filtered + per_page - 1) // per_page
+    
+    return render_template(
+        'admin/logs.html',
+        logs=logs,
+        total_logs=total_logs,
+        user_logs=user_logs,
+        admin_logs=admin_logs,
+        error_logs=error_logs,
+        security_logs=security_logs,
+        modules=modules,
+        active_type=log_type,
+        active_module=module,
+        page=page,
+        total_pages=total_pages
+    )
+
+@admin_bp.route('/logs/<log_id>')
+@login_required
+@admin_required
+def log_detail(log_id):
+    """Log detayını görüntüle"""
+    # ObjectId'ye dönüştür
+    from bson import ObjectId
+    log_data = mongo.db.activity_logs.find_one({"_id": ObjectId(log_id)})
+    
+    if not log_data:
+        flash('Log kaydı bulunamadı', 'danger')
+        return redirect(url_for('admin.logs'))
+    
+    return render_template('admin/log_detail.html', log=log_data) 

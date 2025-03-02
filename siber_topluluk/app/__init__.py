@@ -8,6 +8,7 @@ from config import Config
 from flask_login import LoginManager
 from flask import g
 from datetime import datetime
+from app.utils.log_extension import LoggingExtension
 
 def create_app(test_config=None):
     """Flask uygulamasını oluştur ve yapılandır"""
@@ -43,6 +44,9 @@ def create_app(test_config=None):
     login_manager.login_message = 'Lütfen giriş yapın.'
     login_manager.login_message_category = 'info'
     admin.init_app(app)
+    
+    # Loglama uzantısını ayarla
+    logging_ext = LoggingExtension(app)
     
     # Proxy ayarlarını uygula
     app.wsgi_app = ProxyFix(app.wsgi_app)
