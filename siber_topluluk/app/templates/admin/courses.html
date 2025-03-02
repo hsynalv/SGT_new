@@ -39,22 +39,22 @@
                     <tbody>
                         {% for course in courses %}
                         <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>
+                            <td class="text-info">{{ loop.index }}</td>
+                            <td class="text-white">
                                 <a href="{{ url_for('courses.detail', course_id=course._id) }}" class="text-decoration-none" target="_blank">
                                     {{ course.title | truncate(40) }}
                                 </a>
                             </td>
-                            <td>{{ course.instructor or 'Belirtilmemiş' }}</td>
+                            <td class="text-white">{{ course.instructor or 'Belirtilmemiş' }}</td>
                             <td>
                                 <span class="badge bg-info">{{ course.level or 'Genel' }}</span>
                             </td>
-                            <td>
+                            <td class="text-white">
                                 <a href="{{ url_for('admin_panel.course_enrollments', course_id=course._id) }}" class="text-decoration-none">
                                     <span class="badge bg-secondary">Kayıtları Gör</span>
                                 </a>
                             </td>
-                            <td>
+                            <td class="text-white">
                                 <div class="btn-group">
                                     <a href="{{ url_for('courses.edit', course_id=course._id) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-edit"></i> Düzenle

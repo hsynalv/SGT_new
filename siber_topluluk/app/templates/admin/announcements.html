@@ -38,27 +38,27 @@
                     <tbody>
                         {% for announcement in announcements %}
                         <tr>
-                            <td>{{ loop.index + ((page - 1) * 10) }}</td>
-                            <td>
+                            <td class="text-info">{{ loop.index + ((page - 1) * 10) }}</td>
+                            <td class="text-white">
                                 <a href="{{ url_for('main.announcement_detail', announcement_id=announcement._id) }}" target="_blank" class="text-decoration-none">
                                     {{ announcement.title | truncate(40) }}
                                 </a>
                             </td>
-                            <td>
+                            <td class="text-white">
                                 {% if announcement.created_at %}
                                 <span class="format-date">{{ announcement.created_at }}</span>
                                 {% else %}
                                 -
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="text-white">
                                 {% if announcement.is_active %}
                                 <span class="badge bg-success">Aktif</span>
                                 {% else %}
                                 <span class="badge bg-secondary">Pasif</span>
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="text-white">
                                 <div class="btn-group">
                                     <a href="{{ url_for('admin_panel.edit_announcement', announcement_id=announcement._id) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-edit"></i> Düzenle

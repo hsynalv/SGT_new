@@ -27,7 +27,7 @@
                 <div class="card-body">
                     <h2 class="card-title">{{ challenge.title }}</h2>
                     
-                    <div class="challenge-description mb-4">
+                    <div class="challenge-description mb-4 text-white bg-dark">
                         {{ challenge.description_html|safe }}
                     </div>
                     
@@ -55,7 +55,7 @@
                                     <input type="text" class="form-control" name="flag" placeholder="Flag formatı: CTF{...}" required>
                                     <button class="btn btn-primary" type="submit">Gönder</button>
                                 </div>
-                                <div class="form-text">Flag'leri göndermeden önce doğru formatta olduğundan emin olun.</div>
+                                <div class="form-text text-info">Flag'leri göndermeden önce doğru formatta olduğundan emin olun.</div>
                             </form>
                         </div>
                     {% else %}
@@ -77,11 +77,11 @@
                         {% for hint in challenge.hints %}
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="hint{{ loop.index }}Header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hint{{ loop.index }}Collapse" aria-expanded="false" aria-controls="hint{{ loop.index }}Collapse">
+                                <button class="accordion-button collapsed bg-dark text-white" type="button" data-bs-toggle="collapse" data-bs-target="#hint{{ loop.index }}Collapse" aria-expanded="false" aria-controls="hint{{ loop.index }}Collapse">
                                     İpucu #{{ loop.index }}
                                 </button>
                             </h2>
-                            <div id="hint{{ loop.index }}Collapse" class="accordion-collapse collapse" aria-labelledby="hint{{ loop.index }}Header" data-bs-parent="#hintsAccordion">
+                            <div id="hint{{ loop.index }}Collapse" class="accordion-collapse collapse bg-dark text-info" aria-labelledby="hint{{ loop.index }}Header" data-bs-parent="#hintsAccordion">
                                 <div class="accordion-body">
                                     {{ hint }}
                                 </div>
@@ -126,13 +126,13 @@
                 <div class="card-body">
                     <p>Aynı kategorideki diğer görevlere göz atın:</p>
                     <div class="list-group">
-                        <a href="{{ url_for('ctf.challenges', category=challenge.category, difficulty='kolay') }}" class="list-group-item list-group-item-action">
+                        <a href="{{ url_for('ctf.challenges', category=challenge.category, difficulty='kolay') }}" class="list-group-item list-group-item-action bg-dark text-info">
                             <i class="fas fa-angle-right me-2"></i>{{ challenge.category|capitalize }} - Kolay
                         </a>
-                        <a href="{{ url_for('ctf.challenges', category=challenge.category, difficulty='orta') }}" class="list-group-item list-group-item-action">
+                        <a href="{{ url_for('ctf.challenges', category=challenge.category, difficulty='orta') }}" class="list-group-item list-group-item-action bg-dark text-info">
                             <i class="fas fa-angle-right me-2"></i>{{ challenge.category|capitalize }} - Orta
                         </a>
-                        <a href="{{ url_for('ctf.challenges', category=challenge.category, difficulty='zor') }}" class="list-group-item list-group-item-action">
+                        <a href="{{ url_for('ctf.challenges', category=challenge.category, difficulty='zor') }}" class="list-group-item list-group-item-action bg-dark text-info">
                             <i class="fas fa-angle-right me-2"></i>{{ challenge.category|capitalize }} - Zor
                         </a>
                     </div>

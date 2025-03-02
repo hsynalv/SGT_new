@@ -40,15 +40,15 @@
                     <tbody>
                         {% for user in users %}
                         <tr>
-                            <td>{{ loop.index + ((page - 1) * 10) }}</td>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>
+                            <td class="text-info">{{ loop.index + ((page - 1) * 10) }}</td>
+                            <td class="text-white">{{ user.username }}</td>
+                            <td class="text-white">{{ user.email }}</td>
+                            <td class="text-white">
                                 <span class="badge {% if user.is_admin %}bg-danger{% elif user.is_member %}bg-success{% else %}bg-secondary{% endif %}">
                                     {{ user.role }}
                                 </span>
                             </td>
-                            <td>
+                            <td class="text-white">
                                 {% if user.created_at %}
                                 <span class="format-date">{{ user.created_at }}</span>
                                 {% else %}

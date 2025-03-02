@@ -29,20 +29,20 @@
                         </span>
                         {% endfor %}
                     </div>
-                    <p class="text-muted">Üyelik: {{ user.created_at|default('Bilinmiyor') }}</p>
+                    <p class="text-white">Üyelik: {{ user.created_at|default('Bilinmiyor') }}</p>
                     <hr>
                     <div class="row text-center">
                         <div class="col-4">
                             <h5 class="mb-0">{{ solved_challenges|length }}</h5>
-                            <small class="text-muted">Çözülen</small>
+                            <small class="badge">Çözülen</small>
                         </div>
                         <div class="col-4">
                             <h5 class="mb-0">{{ total_points }}</h5>
-                            <small class="text-muted">Puan</small>
+                            <small class="text-info badge">Puan</small>
                         </div>
                         <div class="col-4">
                             <h5 class="mb-0">{{ badges|length }}</h5>
-                            <small class="text-muted">Rozet</small>
+                            <small class="badge">Rozet</small>
                         </div>
                     </div>
                     <hr>

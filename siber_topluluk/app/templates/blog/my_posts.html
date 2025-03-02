@@ -45,10 +45,10 @@
                                     <td>
                                         <span class="badge bg-info">{{ blog.category or 'Genel' }}</span>
                                     </td>
-                                    <td>{{ blog.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                                    <td>{{ blog.views }}</td>
-                                    <td>{{ blog.likes }}</td>
-                                    <td>
+                                    <td class="text-white">{{ blog.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                    <td class="text-white" >{{ blog.views }}</td>
+                                    <td class="text-white">{{ blog.likes | length }}</td>
+                                    <td class="text-white" >
                                         {% if blog.is_published %}
                                             <span class="badge bg-success">Yayında</span>
                                         {% else %}

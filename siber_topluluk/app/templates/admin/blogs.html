@@ -40,29 +40,29 @@
                     <tbody>
                         {% for blog in blogs %}
                         <tr>
-                            <td>{{ loop.index + ((page - 1) * 10) }}</td>
-                            <td>
+                            <td class="text-info">{{ loop.index + ((page - 1) * 10) }}</td>
+                            <td class="text-white">
                                 <a href="{{ url_for('blog.detail', blog_id=blog._id) }}" class="text-decoration-none" target="_blank">
                                     {{ blog.title | truncate(40) }}
                                 </a>
                             </td>
-                            <td>
+                            <td class="text-white">
                                 {% if blog.author %}
                                     {{ blog.author.username }}
                                 {% else %}
                                     Bilinmeyen Yazar
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="text-white">
                                 {% if blog.created_at %}
                                 <span class="format-date">{{ blog.created_at }}</span>
                                 {% else %}
                                 -
                                 {% endif %}
                             </td>
-                            <td>{{ blog.views }}</td>
-                            <td>{{ blog.likes|length }}</td>
-                            <td>
+                            <td class="text-white">{{ blog.views }}</td>
+                            <td class="text-white">{{ blog.likes|length }}</td>
+                            <td class="text-white">
                                 <div class="btn-group">
                                     <a href="{{ url_for('blog.edit', blog_id=blog._id) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-edit"></i> Düzenle
