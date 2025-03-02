@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Duyurular - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Duyurular</h1>
+    
+    <!-- Duyurular Listesi -->
+    <div class="row">
+        {% if announcements %}
+            {% for announcement in announcements %}
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                {% if announcement.image_url %}
+                                <div class="col-md-3">
+                                    <img src="{{ announcement.image_url }}" class="img-fluid rounded" alt="{{ announcement.title }}">
+                                </div>
+                                <div class="col-md-9">
+                                {% else %}
+                                <div class="col-md-12">
+                                {% endif %}
+                                    <h5 class="card-title">{{ announcement.title }}</h5>
+                                    <p class="card-text text-muted">
+                                        <small>
+                                            <i class="far fa-calendar-alt"></i> {{ announcement.created_at.strftime('%d.%m.%Y') }}
+                                        </small>
+                                    </p>
+                                    <p class="card-text">{{ announcement.content|truncate(200) }}</p>
+                                    <a href="{{ url_for('main.announcement_detail', announcement_id=announcement._id) }}" class="btn btn-primary">
+                                        Devamını Oku
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <!-- Sayfalama -->
+            <div class="col-md-12">
+                <nav aria-label="Duyuru sayfaları">
+                    <ul class="pagination justify-content-center">
+                        {% if page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.announcements', page=page-1) }}">Önceki</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Önceki</a>
+                        </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">{{ page }}</span>
+                        </li>
+                        
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.announcements', page=page+1) }}">Sonraki</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        {% else %}
+            <div class="col-md-12">
+                <div class="alert alert-info" role="alert">
+                    Henüz duyuru bulunmamaktadır.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

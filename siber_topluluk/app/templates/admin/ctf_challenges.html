@@ -1,0 +1,302 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}CTF Görevleri Yönetimi - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_panel.index') }}">Yönetim Paneli</a></li>
+            <li class="breadcrumb-item active">CTF Görevleri</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-flag me-2"></i>CTF Görevleri Yönetimi</h4>
+            <a href="{{ url_for('ctf.admin_ctf_create_challenge') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Yeni Görev Ekle
+            </a>
+        </div>
+        <div class="card-body">
+            <!-- Filtreleme -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <form action="{{ url_for('ctf.admin_ctf') }}" method="GET" class="d-flex gap-2">
+                        <select name="category" class="form-select me-2" style="width: auto;">
+                            <option value="">Tüm Kategoriler</option>
+                            {% for category in categories %}
+                            <option value="{{ category.name }}" {% if request.args.get('category') == category.name %}selected{% endif %}>
+                                {{ category.name|capitalize }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <select name="difficulty" class="form-select me-2" style="width: auto;">
+                            <option value="">Tüm Zorluklar</option>
+                            {% for difficulty in difficulties %}
+                            <option value="{{ difficulty.name }}" {% if request.args.get('difficulty') == difficulty.name %}selected{% endif %}>
+                                {{ difficulty.name|capitalize }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-outline-primary">Filtrele</button>
+                        {% if request.args.get('category') or request.args.get('difficulty') %}
+                        <a href="{{ url_for('ctf.admin_ctf') }}" class="btn btn-outline-secondary">Filtreleri Temizle</a>
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <form action="{{ url_for('ctf.admin_ctf') }}" method="GET" class="d-flex">
+                        <input type="text" name="search" class="form-control me-2" placeholder="Görev adı ara..." 
+                               value="{{ request.args.get('search', '') }}">
+                        <button type="submit" class="btn btn-outline-primary">Ara</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Görevler Tablosu -->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Başlık</th>
+                            <th>Kategori</th>
+                            <th>Zorluk</th>
+                            <th>Puan</th>
+                            <th>Çözüm Sayısı</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for challenge in challenges %}
+                        <tr>
+                            <td>{{ challenge._id }}</td>
+                            <td>
+                                <a href="{{ url_for('ctf.challenge_detail', challenge_id=challenge._id) }}" target="_blank">
+                                    {{ challenge.title }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ challenge.category|default('secondary') }}">
+                                    {{ challenge.category|capitalize }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {% if challenge.difficulty == 'kolay' %}bg-success{% elif challenge.difficulty == 'orta' %}bg-warning text-dark{% elif challenge.difficulty == 'zor' %}bg-danger{% else %}bg-dark{% endif %}">
+                                    {{ challenge.difficulty|capitalize }}
+                                </span>
+                            </td>
+                            <td>{{ challenge.points }}</td>
+                            <td>{{ challenge.solve_count }}</td>
+                            <td>
+                                {% if challenge.active %}
+                                <span class="badge bg-success">Aktif</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Pasif</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('ctf.admin_ctf_edit_challenge', challenge_id=challenge._id) }}" 
+                                       class="btn btn-sm btn-outline-primary" title="Düzenle">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-success" title="Durum Değiştir"
+                                            onclick="toggleChallengeStatus('{{ challenge._id }}', {{ challenge.active|lower }})">
+                                        <i class="fas {% if challenge.active %}fa-toggle-on{% else %}fa-toggle-off{% endif %}"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Sil"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ challenge._id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Silme Modalı -->
+                                <div class="modal fade" id="deleteModal{{ challenge._id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ challenge._id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel{{ challenge._id }}">Görevi Sil</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p><strong>"{{ challenge.title }}"</strong> isimli görevi silmek istediğinize emin misiniz?</p>
+                                                <p class="text-danger">Bu işlem geri alınamaz ve tüm ilgili kullanıcı verilerini etkileyebilir!</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                <form action="{{ url_for('ctf.admin_ctf_edit_challenge', challenge_id=challenge._id) }}" method="POST" style="display: inline;">
+                                                    <button type="submit" class="btn btn-danger">Görevi Sil</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-3">Hiç görev bulunamadı.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Sayfalama -->
+            {% if pagination and pagination.pages > 1 %}
+            <nav aria-label="Görevler sayfaları">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('ctf.admin_ctf', page=pagination.page-1, **request.args) }}" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    
+                    {% for p in range(max(1, pagination.page - 2), min(pagination.pages + 1, pagination.page + 3)) %}
+                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('ctf.admin_ctf', page=p, **request.args) }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    <li class="page-item {% if pagination.page == pagination.pages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('ctf.admin_ctf', page=pagination.page+1, **request.args) }}" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- İstatistikler -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Kategorilere Göre Görevler</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoriesChart" width="100%" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Çözülme İstatistikleri</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="solveStatsChart" width="100%" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Kategori grafiği
+    const ctxCategories = document.getElementById('categoriesChart').getContext('2d');
+    const categoriesChart = new Chart(ctxCategories, {
+        type: 'bar',
+        data: {
+            labels: [{% for cat in category_stats %}'{{ cat.name|capitalize }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Görev Sayısı',
+                data: [{% for cat in category_stats %}{{ cat.count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    '#4e73df', // web
+                    '#1cc88a', // crypto
+                    '#36b9cc', // forensics
+                    '#f6c23e', // reverse
+                    '#e74a3b', // pwnable
+                    '#858796'  // misc
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    // Çözülme istatistikleri grafiği
+    const ctxSolveStats = document.getElementById('solveStatsChart').getContext('2d');
+    const solveStatsChart = new Chart(ctxSolveStats, {
+        type: 'line',
+        data: {
+            labels: [{% for stat in solve_stats %}'{{ stat.date }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Çözüm Sayısı',
+                data: [{% for stat in solve_stats %}{{ stat.count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    // Görev durumu değiştirme fonksiyonu
+    window.toggleChallengeStatus = function(challengeId, currentStatus) {
+        const newStatus = !currentStatus;
+        fetch(`/ctf/admin/challenge/${challengeId}/toggle_status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'  // CSRF koruması için
+            },
+            body: JSON.stringify({ active: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Durum değiştirme işlemi başarısız oldu: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Hata:', error);
+            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+        });
+    };
+});
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .badge.bg-web { background-color: #4e73df; }
+    .badge.bg-crypto { background-color: #1cc88a; }
+    .badge.bg-forensics { background-color: #36b9cc; }
+    .badge.bg-reverse { background-color: #f6c23e; }
+    .badge.bg-pwnable { background-color: #e74a3b; }
+    .badge.bg-misc { background-color: #858796; }
+</style>
+{% endblock %} 

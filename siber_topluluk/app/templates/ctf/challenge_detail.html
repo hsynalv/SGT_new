@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ challenge.title }} - CTF Görevi - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('ctf.index') }}">CTF Platformu</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('ctf.challenges') }}">Görevler</a></li>
+            <li class="breadcrumb-item active">{{ challenge.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-{{ challenge.category|default('secondary') }}">{{ challenge.category|capitalize }}</span>
+                        <span class="badge {% if challenge.difficulty == 'kolay' %}bg-success{% elif challenge.difficulty == 'orta' %}bg-warning{% elif challenge.difficulty == 'zor' %}bg-danger{% else %}bg-dark{% endif %}">
+                            {{ challenge.difficulty|capitalize }}
+                        </span>
+                    </div>
+                    <span class="badge bg-primary">{{ challenge.points }} Puan</span>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ challenge.title }}</h2>
+                    
+                    <div class="challenge-description mb-4">
+                        {{ challenge.description_html|safe }}
+                    </div>
+                    
+                    {% if challenge.files %}
+                    <div class="challenge-files mb-4">
+                        <h5><i class="fas fa-file-download me-2"></i>Dosyalar</h5>
+                        <ul class="list-group">
+                            {% for file in challenge.files %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ file.name }}
+                                <a href="{{ file.url }}" class="btn btn-sm btn-outline-primary" download>
+                                    <i class="fas fa-download"></i> İndir
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    {% if not is_solved %}
+                        <div class="flag-submission mt-4">
+                            <h5><i class="fas fa-flag me-2"></i>Flag Gönder</h5>
+                            <form method="POST" action="{{ url_for('ctf.submit_flag', challenge_id=challenge._id) }}">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="flag" placeholder="Flag formatı: CTF{...}" required>
+                                    <button class="btn btn-primary" type="submit">Gönder</button>
+                                </div>
+                                <div class="form-text">Flag'leri göndermeden önce doğru formatta olduğundan emin olun.</div>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success mt-4">
+                            <i class="fas fa-check-circle me-2"></i>Bu görevi başarıyla çözdünüz!
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- İpuçları -->
+            {% if challenge.hints %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>İpuçları</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="hintsAccordion">
+                        {% for hint in challenge.hints %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="hint{{ loop.index }}Header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hint{{ loop.index }}Collapse" aria-expanded="false" aria-controls="hint{{ loop.index }}Collapse">
+                                    İpucu #{{ loop.index }}
+                                </button>
+                            </h2>
+                            <div id="hint{{ loop.index }}Collapse" class="accordion-collapse collapse" aria-labelledby="hint{{ loop.index }}Header" data-bs-parent="#hintsAccordion">
+                                <div class="accordion-body">
+                                    {{ hint }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Çözüm İstatistikleri -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>İstatistikler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Çözüm Sayısı:</span>
+                        <span class="badge bg-primary">{{ solved_count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Zorluk:</span>
+                        <span class="badge {% if challenge.difficulty == 'kolay' %}bg-success{% elif challenge.difficulty == 'orta' %}bg-warning{% elif challenge.difficulty == 'zor' %}bg-danger{% else %}bg-dark{% endif %}">
+                            {{ challenge.difficulty|capitalize }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Puan:</span>
+                        <span class="badge bg-info">{{ challenge.points }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Benzer Görevler -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Benzer Görevler</h5>
+                </div>
+                <div class="card-body">
+                    <p>Aynı kategorideki diğer görevlere göz atın:</p>
+                    <div class="list-group">
+                        <a href="{{ url_for('ctf.challenges', category=challenge.category, difficulty='kolay') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-angle-right me-2"></i>{{ challenge.category|capitalize }} - Kolay
+                        </a>
+                        <a href="{{ url_for('ctf.challenges', category=challenge.category, difficulty='orta') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-angle-right me-2"></i>{{ challenge.category|capitalize }} - Orta
+                        </a>
+                        <a href="{{ url_for('ctf.challenges', category=challenge.category, difficulty='zor') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-angle-right me-2"></i>{{ challenge.category|capitalize }} - Zor
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .badge.bg-web { background-color: #4e73df; }
+    .badge.bg-crypto { background-color: #1cc88a; }
+    .badge.bg-forensics { background-color: #36b9cc; }
+    .badge.bg-reverse { background-color: #f6c23e; }
+    .badge.bg-pwnable { background-color: #e74a3b; }
+    .badge.bg-misc { background-color: #858796; }
+    
+    .challenge-description {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 0.25rem;
+    }
+    
+    .challenge-description pre {
+        background-color: #272822;
+        color: #f8f8f2;
+        padding: 1rem;
+        border-radius: 0.25rem;
+        overflow-x: auto;
+    }
+    
+    .challenge-description code {
+        font-family: 'Courier New', Courier, monospace;
+    }
+</style>
+{% endblock %} 

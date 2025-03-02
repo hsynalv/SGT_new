@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog Yazıları Yönetimi - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_panel.index') }}">Admin Paneli</a></li>
+            <li class="breadcrumb-item active">Blog Yazıları Yönetimi</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1>Blog Yazıları Yönetimi</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ url_for('blog.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Yeni Blog Yazısı Ekle
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Başlık</th>
+                            <th>Yazar</th>
+                            <th>Oluşturma Tarihi</th>
+                            <th>Görüntülenme</th>
+                            <th>Beğeni</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for blog in blogs %}
+                        <tr>
+                            <td>{{ loop.index + ((page - 1) * 10) }}</td>
+                            <td>
+                                <a href="{{ url_for('blog.detail', blog_id=blog._id) }}" class="text-decoration-none" target="_blank">
+                                    {{ blog.title | truncate(40) }}
+                                </a>
+                            </td>
+                            <td>
+                                {% if blog.author %}
+                                    {{ blog.author.username }}
+                                {% else %}
+                                    Bilinmeyen Yazar
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if blog.created_at %}
+                                <span class="format-date">{{ blog.created_at }}</span>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>{{ blog.views }}</td>
+                            <td>{{ blog.likes|length }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('blog.edit', blog_id=blog._id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i> Düzenle
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteBlogModal{{ blog._id }}">
+                                        <i class="fas fa-trash"></i> Sil
+                                    </button>
+                                </div>
+                                
+                                <!-- Blog Silme Modal -->
+                                <div class="modal fade" id="deleteBlogModal{{ blog._id }}" tabindex="-1" aria-labelledby="deleteBlogModalLabel{{ blog._id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteBlogModalLabel{{ blog._id }}">Blog Yazısı Sil</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>"{{ blog.title }}" başlıklı blog yazısını silmek istediğinize emin misiniz?</p>
+                                                <p class="text-danger"><strong>Bu işlem geri alınamaz!</strong></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                <form action="{{ url_for('admin_panel.delete_blog', blog_id=blog._id) }}" method="post">
+                                                    <button type="submit" class="btn btn-danger">Blog Yazısını Sil</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sayfalama -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <nav aria-label="Blog yazıları sayfaları">
+                <ul class="pagination justify-content-center">
+                    {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_panel.blogs', page=page-1) }}" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for p in range(1, total_pages + 1) %}
+                        {% if p == page %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ p }}</a></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('admin_panel.blogs', page=p) }}">{{ p }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page < total_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_panel.blogs', page=page+1) }}" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Tarih formatını düzenle
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateElements = document.querySelectorAll('.format-date');
+        dateElements.forEach(element => {
+            const date = new Date(element.textContent);
+            if (!isNaN(date)) {
+                element.textContent = date.toLocaleDateString('tr-TR') + ' ' + date.toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'});
+            }
+        });
+    });
+</script>
+{% endblock %} 

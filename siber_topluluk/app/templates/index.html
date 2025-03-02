@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded-3 mb-4">
+    <div class="container">
+        <h1 class="display-4">Siber Topluluk'a Hoş Geldiniz</h1>
+        <p class="lead">Siber güvenlik ve teknoloji konularında bilgi paylaşımı yapan bir topluluk.</p>
+        <hr class="my-4">
+        <p>Topluluğumuza katılın, blog yazıları paylaşın ve güncel duyurulardan haberdar olun.</p>
+        {% if not current_user.is_authenticated %}
+        <div class="mt-4">
+            <a class="btn btn-primary btn-lg me-2" href="{{ url_for('auth.register') }}" role="button">Kayıt Ol</a>
+            <a class="btn btn-outline-primary btn-lg" href="{{ url_for('auth.login') }}" role="button">Giriş Yap</a>
+        </div>
+        {% else %}
+        <div class="mt-4">
+            <a class="btn btn-primary btn-lg" href="{{ url_for('blog.create') }}" role="button">Blog Yazısı Oluştur</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Duyurular -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Son Duyurular</h2>
+        </div>
+    </div>
+    <div class="row">
+        {% if announcements %}
+            {% for announcement in announcements %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if announcement.image_url %}
+                    <img src="{{ announcement.image_url }}" class="card-img-top" alt="{{ announcement.title }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/350x150?text=Duyuru" class="card-img-top" alt="Placeholder">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ announcement.title }}</h5>
+                        <p class="card-text">{{ announcement.content|truncate(100) }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{{ url_for('main.announcement_detail', announcement_id=announcement._id) }}" class="btn btn-sm btn-outline-primary">Devamını Oku</a>
+                        <small class="text-muted float-end">{{ announcement.created_at.strftime('%d.%m.%Y') }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-md-12">
+                <div class="alert alert-info">Henüz duyuru bulunmamaktadır.</div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-12 text-center">
+            <a href="{{ url_for('main.announcements') }}" class="btn btn-outline-primary">Tüm Duyurular</a>
+        </div>
+    </div>
+</div>
+
+<!-- Popüler Blog Yazıları -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Popüler Blog Yazıları</h2>
+        </div>
+    </div>
+    <div class="row">
+        {% if popular_blogs %}
+            {% for blog in popular_blogs %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if blog.image_url %}
+                    <img src="{{ blog.image_url }}" class="card-img-top" alt="{{ blog.title }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/350x150?text=Blog" class="card-img-top" alt="Placeholder">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ blog.title }}</h5>
+                        <p class="card-text">{{ blog.content|truncate(100) }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{{ url_for('blog.detail', blog_id=blog._id) }}" class="btn btn-sm btn-outline-primary">Devamını Oku</a>
+                        <div class="float-end">
+                            <small class="text-muted me-2">
+                                <i class="fas fa-eye"></i> {{ blog.views }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-heart"></i> {{ blog.likes|length }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-md-12">
+                <div class="alert alert-info">Henüz blog yazısı bulunmamaktadır.</div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-12 text-center">
+            <a href="{{ url_for('blog.index') }}" class="btn btn-outline-primary">Tüm Blog Yazıları</a>
+        </div>
+    </div>
+</div>
+
+<!-- Topluluk Hakkında -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Topluluğumuz Hakkında</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <p>Siber Topluluk, siber güvenlik ve teknoloji konularında bilgi paylaşımı yapmak, farkındalık oluşturmak ve bu alanda kendini geliştirmek isteyen herkesi bir araya getiren bir platformdur.</p>
+            <p>Amacımız, siber güvenlik alanında güncel bilgileri paylaşmak, etkinlikler düzenlemek ve üyelerimizin kendilerini geliştirmelerine yardımcı olmaktır.</p>
+            <a href="{{ url_for('main.about') }}" class="btn btn-outline-primary">Daha Fazla Bilgi</a>
+        </div>
+        <div class="col-md-6">
+            <img src="https://via.placeholder.com/600x400?text=Siber+Topluluk" class="img-fluid rounded" alt="Siber Topluluk">
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3"><i class="fas fa-graduation-cap me-2 text-primary"></i>Kayıtlı Kurslarım</h1>
+            <p class="lead text-muted">
+                Kayıt olduğunuz kurslar ve ilerleme durumunuz
+            </p>
+        </div>
+        <div class="col-md-4 text-end align-self-center">
+            <a href="{{ url_for('courses.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-list me-2"></i>Tüm Kursları Gör
+            </a>
+        </div>
+    </div>
+    
+    {% if courses %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for course in courses %}
+                {% set enrollment = enrollments.get(course._id|string) %}
+                <div class="col">
+                    <div class="card h-100 shadow">
+                        {% if course.image_url %}
+                            <img src="{{ course.image_url }}" class="card-img-top rounded-top" alt="{{ course.title }}">
+                        {% else %}
+                            <div class="card-img-top bg-primary text-white text-center py-5 rounded-top">
+                                <i class="fas fa-book-open fa-3x"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ course.title }}</h5>
+                            <p class="card-text text-muted">{{ course.instructor or 'Siber Topluluk' }}</p>
+                            <div class="mb-3">
+                                <span class="badge rounded-pill bg-primary">{{ course.level or 'Seviye belirtilmemiş' }}</span>
+                                {% for tag in course.tags %}
+                                    <span class="badge rounded-pill bg-secondary">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            
+                            {% if enrollment %}
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">İlerleme Durumu</label>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar progress-bar-striped bg-success" role="progressbar" 
+                                             style="width: {{ enrollment.progress }}%;" 
+                                             aria-valuenow="{{ enrollment.progress }}" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <div class="small text-end mt-1">{{ enrollment.progress }}%</div>
+                                </div>
+                                <p class="small text-muted">
+                                    <i class="fas fa-clock me-1"></i>Kaydolma: 
+                                    {{ enrollment.created_at.strftime('%d.%m.%Y') }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <a href="{{ url_for('courses.detail', course_id=course._id) }}" class="btn btn-primary w-100">
+                                <i class="fas fa-play-circle me-2"></i>Kursa Devam Et
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-graduation-cap fa-4x text-muted mb-3"></i>
+                <h3 class="text-muted">Henüz Kayıtlı Kursunuz Yok</h3>
+                <p class="mb-4">Eğitiminize başlamak için kurslar kataloğumuza göz atın</p>
+                <a href="{{ url_for('courses.index') }}" class="btn btn-primary">
+                    <i class="fas fa-list me-2"></i>Kursları Keşfet
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

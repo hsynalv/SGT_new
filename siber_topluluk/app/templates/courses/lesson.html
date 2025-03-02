@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }} - {{ course.title }} - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('courses.index') }}">Eğitimler</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('courses.detail', course_id=course._id) }}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item active">{{ lesson.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Video İçeriği -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{{ lesson.order }}. {{ lesson.title }}</h4>
+                    {% if current_user.is_admin %}
+                    <div>
+                        <a href="{{ url_for('courses.edit_lesson', course_id=course._id, lesson_id=lesson._id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-edit"></i> Düzenle
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="ratio ratio-16x9 mb-4">
+                        <iframe src="{{ lesson.video_url }}" allowfullscreen></iframe>
+                    </div>
+                    
+                    <h5>Ders Açıklaması</h5>
+                    <p>{{ lesson.description }}</p>
+                    
+                    {% if lesson.duration %}
+                    <p><small class="text-muted"><i class="fas fa-clock me-1"></i> Süre: {{ lesson.duration }}</small></p>
+                    {% endif %}
+                    
+                    <!-- İlerleme Güncelleme -->
+                    {% if enrollment %}
+                    <div class="mt-4">
+                        <h5>İlerlemeniz</h5>
+                        <div class="progress mb-2">
+                            <div class="progress-bar" role="progressbar" id="progress-bar" style="width: {{ enrollment.progress }}%;" 
+                                aria-valuenow="{{ enrollment.progress }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ enrollment.progress }}%
+                            </div>
+                        </div>
+                        <div class="btn-group" role="group" aria-label="İlerleme durumu">
+                            <button type="button" class="btn btn-outline-primary" onclick="updateProgress(25)">25%</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="updateProgress(50)">50%</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="updateProgress(75)">75%</button>
+                            <button type="button" class="btn btn-outline-success" onclick="updateProgress(100)">Tamamlandı (100%)</button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Sonraki/Önceki Dersler -->
+            <div class="d-flex justify-content-between mt-4">
+                {% if prev_lesson %}
+                <a href="{{ url_for('courses.lesson_detail', course_id=course._id, lesson_id=prev_lesson._id) }}" class="btn btn-outline-primary">
+                    <i class="fas fa-chevron-left me-1"></i> Önceki Ders
+                </a>
+                {% else %}
+                <button class="btn btn-outline-secondary" disabled>
+                    <i class="fas fa-chevron-left me-1"></i> Önceki Ders
+                </button>
+                {% endif %}
+                
+                <a href="{{ url_for('courses.detail', course_id=course._id) }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-th-list me-1"></i> Ders Listesi
+                </a>
+                
+                {% if next_lesson %}
+                <a href="{{ url_for('courses.lesson_detail', course_id=course._id, lesson_id=next_lesson._id) }}" class="btn btn-outline-primary">
+                    Sonraki Ders <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+                {% else %}
+                <button class="btn btn-outline-secondary" disabled>
+                    Sonraki Ders <i class="fas fa-chevron-right ms-1"></i>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Ders Listesi (Yan Taraf) -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Kurs İçeriği</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for l in lessons %}
+                            <a href="{{ url_for('courses.lesson_detail', course_id=course._id, lesson_id=l._id) }}" 
+                               class="list-group-item list-group-item-action {% if l._id == lesson._id %}active{% endif %}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <span>{{ l.order }}. {{ l.title }}</span>
+                                    {% if l._id == lesson._id %}
+                                    <i class="fas fa-play"></i>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('courses.detail', course_id=course._id) }}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fas fa-arrow-left me-1"></i> Kurs Sayfasına Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function updateProgress(progress) {
+        fetch("{{ url_for('courses.update_progress', course_id=course._id) }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ progress: progress }),
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const progressBar = document.getElementById('progress-bar');
+                progressBar.style.width = progress + '%';
+                progressBar.setAttribute('aria-valuenow', progress);
+                progressBar.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    // İlerleme tamamlandıysa, sonraki derse git veya başka bir işlem yap
+                    const nextLessonButton = document.querySelector('[data-next-lesson]');
+                    if (nextLessonButton) {
+                        setTimeout(() => {
+                            window.location.href = nextLessonButton.getAttribute('href');
+                        }, 1500);
+                    }
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %} 

@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}CTF Yönetimi - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_panel.index') }}">Admin Paneli</a></li>
+            <li class="breadcrumb-item active">CTF Yönetimi</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>CTF Yönetimi</h1>
+            <p class="lead text-muted">CTF görevleri, rozetler ve katılımcıları yönetin.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('ctf.admin_ctf_create_challenge') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Yeni Görev Oluştur
+            </a>
+        </div>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Görevler</h5>
+                    <p class="card-text display-4">{{ challenges|length }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Rozetler</h5>
+                    <p class="card-text display-4">{{ badges|length }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Gönderimler</h5>
+                    <p class="card-text display-4">{{ total_submissions }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Doğru Çözümler</h5>
+                    <p class="card-text display-4">{{ correct_submissions }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTF Görevleri ve Menüler -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">CTF Görevleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <p>Toplam {{ challenges|length }} görev bulunmaktadır.</p>
+                        <a href="{{ url_for('ctf.admin_ctf_create_challenge') }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus-circle me-1"></i>Yeni Ekle
+                        </a>
+                    </div>
+                    <hr>
+                    
+                    <div class="list-group">
+                        {% if challenges %}
+                            {% for challenge in challenges[:5] %}
+                                <a href="{{ url_for('ctf.admin_ctf_edit_challenge', challenge_id=challenge._id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ challenge.title }}</h6>
+                                        <small class="text-muted">{{ challenge.category }} / {{ challenge.difficulty }}</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ challenge.points }} Puan</span>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <p class="text-muted">Henüz hiç CTF görevi bulunmuyor.</p>
+                                <a href="{{ url_for('ctf.admin_ctf_create_challenge') }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus-circle me-1"></i>İlk Görevi Oluştur
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if challenges|length > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('ctf.admin_ctf_edit_challenge', challenge_id=challenges[0]._id) }}" class="btn btn-outline-primary btn-sm">Tüm Görevleri Görüntüle</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Rozetler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <p>Toplam {{ badges|length }} rozet bulunmaktadır.</p>
+                        <a href="{{ url_for('ctf.admin_ctf_create_badge') }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-plus-circle me-1"></i>Yeni Ekle
+                        </a>
+                    </div>
+                    <hr>
+                    
+                    <div class="list-group">
+                        {% if badges %}
+                            {% for badge in badges[:5] %}
+                                <a href="{{ url_for('ctf.admin_ctf_edit_badge', badge_id=badge._id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        {% if badge.image_url %}
+                                            <img src="{{ badge.image_url }}" alt="{{ badge.name }}" class="me-2" style="width: 30px; height: 30px;">
+                                        {% else %}
+                                            <i class="fas fa-award me-2 text-warning"></i>
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="mb-1">{{ badge.name }}</h6>
+                                            <small class="text-muted">{{ badge.description|truncate(40) }}</small>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <p class="text-muted">Henüz hiç rozet bulunmuyor.</p>
+                                <a href="{{ url_for('ctf.admin_ctf_create_badge') }}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-plus-circle me-1"></i>İlk Rozeti Oluştur
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if badges|length > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('ctf.admin_ctf_edit_badge', badge_id=badges[0]._id) }}" class="btn btn-outline-success btn-sm">Tüm Rozetleri Görüntüle</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hızlı İşlemler -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Hızlı İşlemler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('ctf.admin_ctf_create_challenge') }}" class="btn btn-primary w-100">
+                                <i class="fas fa-plus-circle me-2"></i>Yeni Görev Oluştur
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('ctf.admin_ctf_create_badge') }}" class="btn btn-success w-100">
+                                <i class="fas fa-award me-2"></i>Yeni Rozet Oluştur
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('ctf.scoreboard') }}" class="btn btn-info w-100 text-white">
+                                <i class="fas fa-trophy me-2"></i>Skor Tablosu
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('ctf.index') }}" class="btn btn-secondary w-100">
+                                <i class="fas fa-flag me-2"></i>CTF Ana Sayfası
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

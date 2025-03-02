@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Blog Yazıları</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('blog.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Yeni Blog Yazısı
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        {% if blogs %}
+            {% for blog in blogs %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if blog.image_url %}
+                    <img src="{{ blog.image_url }}" class="card-img-top" alt="{{ blog.title }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/350x150?text=Blog" class="card-img-top" alt="Placeholder">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ blog.title }}</h5>
+                        <p class="card-text">{{ blog.content|truncate(150) }}</p>
+                        {% if blog.tags %}
+                        <div class="mb-2">
+                            {% for tag in blog.tags %}
+                            <span class="badge bg-secondary me-1">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{{ url_for('blog.detail', blog_id=blog._id) }}" class="btn btn-sm btn-outline-primary">Devamını Oku</a>
+                        <div class="float-end">
+                            <small class="text-muted me-2">
+                                <i class="fas fa-eye"></i> {{ blog.views }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-heart"></i> {{ blog.likes|length }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    Henüz blog yazısı bulunmamaktadır.
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('blog.create') }}" class="alert-link">İlk blog yazısını oluşturmak için tıklayın.</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Sayfalama -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <nav aria-label="Blog sayfaları">
+                <ul class="pagination justify-content-center">
+                    {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('blog.index', page=page-1) }}" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for p in range(1, 6) %}
+                        {% if p == page %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ p }}</a></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('blog.index', page=p) }}">{{ p }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('blog.index', page=page+1) }}" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %} 

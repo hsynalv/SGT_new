@@ -1,0 +1,152 @@
+/* Genel Stiller */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Kartlar */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-title {
+    font-weight: 600;
+    color: #212529;
+}
+
+/* Blog ve Duyuru Detay Sayfası */
+.blog-content, .announcement-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.blog-header, .announcement-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 20px;
+}
+
+.blog-meta, .announcement-meta {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.blog-image, .announcement-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* Form Stilleri */
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+.social-icons a {
+    display: inline-block;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+}
+
+.social-icons a:hover {
+    transform: scale(1.2);
+}
+
+/* Profil Sayfası */
+.profile-header {
+    background-color: #343a40;
+    color: white;
+    padding: 30px 0;
+    margin-bottom: 30px;
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid white;
+}
+
+/* Admin Paneli */
+.admin-dashboard-card {
+    text-align: center;
+    padding: 20px;
+}
+
+.admin-dashboard-card i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #0d6efd;
+}
+
+.admin-dashboard-card .count {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* Duyurular */
+.announcement-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+/* Responsive Ayarlar */
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 150px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+} 

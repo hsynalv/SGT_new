@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3"><i class="fas fa-pen-fancy me-2 text-primary"></i>Yazılarım</h1>
+            <p class="lead text-muted">
+                Yazdığınız ve paylaştığınız tüm blog yazıları
+            </p>
+        </div>
+        <div class="col-md-4 text-end align-self-center">
+            <a href="{{ url_for('blog.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Yeni Yazı Ekle
+            </a>
+        </div>
+    </div>
+    
+    {% if blogs %}
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover shadow-sm">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th>Başlık</th>
+                                <th>Kategori</th>
+                                <th>Oluşturulma Tarihi</th>
+                                <th>Görüntülenme</th>
+                                <th>Beğeni</th>
+                                <th>Durum</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for blog in blogs %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('blog.detail', blog_id=blog._id) }}" class="text-decoration-none fw-bold">
+                                            {{ blog.title | truncate(40) }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ blog.category or 'Genel' }}</span>
+                                    </td>
+                                    <td>{{ blog.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                    <td>{{ blog.views }}</td>
+                                    <td>{{ blog.likes }}</td>
+                                    <td>
+                                        {% if blog.is_published %}
+                                            <span class="badge bg-success">Yayında</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Taslak</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('blog.edit', blog_id=blog._id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    data-bs-toggle="modal" data-bs-target="#deleteModal{{ blog._id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Delete Confirmation Modal -->
+                                        <div class="modal fade" id="deleteModal{{ blog._id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Yazıyı Sil</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>"{{ blog.title }}" başlıklı yazıyı silmek istediğinize emin misiniz?</p>
+                                                        <p class="text-danger">Bu işlem geri alınamaz!</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                        <form action="{{ url_for('blog.delete', blog_id=blog._id) }}" method="POST">
+                                                            <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        {% if page > 1 or blogs|length == 10 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('blog.my_posts', page=page-1) }}">Önceki</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Önceki</span>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">{{ page }}</span>
+                    </li>
+                    
+                    {% if blogs|length == 10 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('blog.my_posts', page=page+1) }}">Sonraki</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Sonraki</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+        
+    {% else %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-pen-nib fa-4x text-muted mb-3"></i>
+                <h3 class="text-muted">Henüz Hiç Yazınız Yok</h3>
+                <p class="mb-4">Topluluğumuzda bilgi paylaşımı yaparak katkıda bulunabilirsiniz</p>
+                <a href="{{ url_for('blog.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i>İlk Yazınızı Oluşturun
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Bildirim - Hiç yazı yoksa gösterilir -->
+{% if not blogs %}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" id="noBlogsToast">
+        <div class="toast-header bg-warning">
+            <i class="fas fa-exclamation-circle me-2 text-white"></i>
+            <strong class="me-auto text-dark">Bilgi</strong>
+            <small class="text-muted">Şimdi</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body d-flex">
+            <div class="me-3 fs-4">
+                <i class="fas fa-lightbulb text-warning"></i>
+            </div>
+            <div>
+                <strong>Henüz hiç blog yazınız yok!</strong><br>
+                Yeni bir yazı oluşturmak için "Yeni Yazı Ekle" butonunu kullanabilirsiniz.
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Toast bildirimini otomatik göster ve 8 saniye sonra kapat
+    document.addEventListener('DOMContentLoaded', function() {
+        const toastEl = document.getElementById('noBlogsToast');
+        if (toastEl) {
+            const toast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 8000
+            });
+            toast.show();
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Rozet Düzenle - {{ badge.name }} - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_panel.index') }}">Admin Paneli</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('ctf.admin_ctf') }}">CTF Yönetimi</a></li>
+            <li class="breadcrumb-item active">Rozet Düzenle</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Rozet Düzenle: {{ badge.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('ctf.admin_ctf_edit_badge', badge_id=badge._id) }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Rozet Adı <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ badge.name }}" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Rozet Açıklaması <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" required>{{ badge.description }}</textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="image_url" class="form-label">Resim URL</label>
+                                    <input type="text" class="form-control" id="image_url" name="image_url" value="{{ badge.image_url }}" placeholder="https://örnek.com/rozet.png">
+                                    <div class="form-text">Rozet için bir resim URL'si girin (opsiyonel).</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="criteria_type" class="form-label">Kriter Türü <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="criteria_type" name="criteria_type" required>
+                                        <option value="">Kriter Türü Seçin</option>
+                                        <option value="min_points" {% if criteria_type == 'min_points' %}selected{% endif %}>Minimum Puan</option>
+                                        <option value="challenge_count" {% if criteria_type == 'challenge_count' %}selected{% endif %}>Görev Sayısı</option>
+                                        <option value="category" {% if criteria_type == 'category' %}selected{% endif %}>Kategori Bazlı</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3 criteria-field" id="min_points_field" style="display: {% if criteria_type == 'min_points' %}block{% else %}none{% endif %};">
+                                    <label for="criteria_value" class="form-label">Minimum Puan <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="min_points_value" name="criteria_value" 
+                                           min="50" step="10" value="{{ criteria_value if criteria_type == 'min_points' else 100 }}">
+                                    <div class="form-text">Kullanıcının bu rozeti kazanması için ulaşması gereken minimum puan.</div>
+                                </div>
+                                
+                                <div class="mb-3 criteria-field" id="challenge_count_field" style="display: {% if criteria_type == 'challenge_count' %}block{% else %}none{% endif %};">
+                                    <label for="criteria_value" class="form-label">Görev Sayısı <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="challenge_count_value" name="criteria_value" 
+                                           min="1" step="1" value="{{ criteria_value if criteria_type == 'challenge_count' else 3 }}">
+                                    <div class="form-text">Kullanıcının bu rozeti kazanması için çözmesi gereken görev sayısı.</div>
+                                </div>
+                                
+                                <div class="mb-3 criteria-field" id="category_field" style="display: {% if criteria_type == 'category' %}block{% else %}none{% endif %};">
+                                    <label for="criteria_value" class="form-label">Kategori <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="category_value" name="criteria_value">
+                                        <option value="">Kategori Seçin</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category }}" {% if criteria_type == 'category' and criteria_value == category %}selected{% endif %}>{{ category }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">Kullanıcının bu rozeti kazanması için en az bir görevi çözmesi gereken kategori.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('ctf.admin_ctf') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>İptal
+                            </a>
+                            <div>
+                                <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteBadgeModal">
+                                    <i class="fas fa-trash-alt me-2"></i>Sil
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Silme Onay Modalı -->
+    <div class="modal fade" id="deleteBadgeModal" tabindex="-1" aria-labelledby="deleteBadgeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteBadgeModalLabel">Rozeti Sil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>{{ badge.name }}</strong> rozetini silmek istediğinizden emin misiniz?</p>
+                    <p class="text-danger">Bu işlem geri alınamaz ve bu rozeti kazanmış kullanıcılardan rozet kaldırılacaktır.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <form action="{{ url_for('ctf.admin_ctf_delete_badge', badge_id=badge._id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-danger">Rozeti Sil</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Kriter türü seçimine göre ilgili alanı göster
+        const criteriaTypeSelect = document.getElementById('criteria_type');
+        const criteriaFields = document.querySelectorAll('.criteria-field');
+        
+        criteriaTypeSelect.addEventListener('change', function() {
+            // Tüm kriter alanlarını gizle
+            criteriaFields.forEach(field => {
+                field.style.display = 'none';
+            });
+            
+            // Seçilen kriter türüne göre ilgili alanı göster
+            const selectedValue = this.value;
+            if (selectedValue) {
+                const selectedField = document.getElementById(`${selectedValue}_field`);
+                if (selectedField) {
+                    selectedField.style.display = 'block';
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

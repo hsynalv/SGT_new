@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}İletişim - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-md-12 text-center">
+            <h1 class="display-4">Bizimle İletişime Geçin</h1>
+            <p class="lead">Sorularınız, önerileriniz veya işbirliği teklifleriniz için bizimle iletişime geçebilirsiniz</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-5 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">İletişim Bilgileri</h2>
+                    
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="flex-shrink-0 me-3">
+                            <i class="fas fa-envelope fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5>E-posta</h5>
+                            <p class="mb-0">info@sibertopluluk.org</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="flex-shrink-0 me-3">
+                            <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5>Adres</h5>
+                            <p class="mb-0">
+                                Teknoloji Fakültesi<br>
+                                Üniversite Caddesi No:123<br>
+                                34000 İstanbul, Türkiye
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="flex-shrink-0 me-3">
+                            <i class="fas fa-phone fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5>Telefon</h5>
+                            <p class="mb-0">+90 212 123 4567</p>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-5 mb-3">Bizi Takip Edin</h5>
+                    <div class="social-icons">
+                        <a href="#" class="text-primary me-3" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="#" class="text-primary me-3" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                        <a href="#" class="text-primary me-3" target="_blank"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="#" class="text-primary me-3" target="_blank"><i class="fab fa-github fa-2x"></i></a>
+                        <a href="#" class="text-primary me-3" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Mesaj Gönderin</h2>
+                    <form id="contactForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="name" placeholder="Adınız">
+                                    <label for="name">Adınız</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="email" placeholder="E-posta Adresiniz">
+                                    <label for="email">E-posta Adresiniz</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="subject" placeholder="Konu">
+                            <label for="subject">Konu</label>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="message" style="height: 150px" placeholder="Mesajınız"></textarea>
+                            <label for="message">Mesajınız</label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button class="btn btn-primary btn-lg" type="submit">Mesaj Gönder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Sıkça Sorulan Sorular</h2>
+                    
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Topluluğa nasıl üye olabilirim?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="faqOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Sitemizin üst menüsünde yer alan <strong>Kayıt Ol</strong> bağlantısından üyelik formunu doldurarak topluluğumuza üye olabilirsiniz. Üyelik ücretsizdir ve temel eğitimlerimize erişim sağlar.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Etkinlikleriniz ne sıklıkla düzenleniyor?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="faqTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Topluluğumuz, her ay düzenli olarak eğitimler, webinarlar ve CTF etkinlikleri düzenlemektedir. Etkinlik takvimi için ana sayfamızı ziyaret edebilir veya e-posta listesine kaydolarak güncel duyurulardan haberdar olabilirsiniz.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Eğitimler için ön bilgi gerekiyor mu?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="faqThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Eğitimlerimiz farklı seviyeler için tasarlanmıştır. Başlangıç seviyesi eğitimlerimize katılmak için herhangi bir ön bilgi gerekmemektedir. Orta ve ileri seviye eğitimler için gereksinimler, her eğitimin detay sayfasında belirtilmiştir.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Mesajınız iletildi! En kısa sürede size dönüş yapacağız.');
+        this.reset();
+    });
+</script>
+{% endblock %}
+
+{% endblock %} 

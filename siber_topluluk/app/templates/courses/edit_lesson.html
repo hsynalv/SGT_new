@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Ders Düzenle - {{ lesson.title }} - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('courses.index') }}">Eğitimler</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('courses.detail', course_id=course._id) }}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item active">Ders Düzenle</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Ders Düzenle: {{ lesson.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('courses.edit_lesson', course_id=course._id, lesson_id=lesson._id) }}" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Ders Başlığı</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ lesson.title }}" required>
+                            <div class="invalid-feedback">
+                                Lütfen bir ders başlığı girin.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Ders Açıklaması</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ lesson.description }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="video_url" class="form-label">Video URL'si</label>
+                            <input type="url" class="form-control" id="video_url" name="video_url" value="{{ lesson.video_url }}" required
+                                   placeholder="https://www.youtube.com/embed/VIDEO_ID veya diğer embed URL'ler">
+                            <div class="invalid-feedback">
+                                Lütfen geçerli bir video URL'si girin.
+                            </div>
+                            <div class="form-text">
+                                YouTube için: https://www.youtube.com/embed/VIDEO_ID<br>
+                                Vimeo için: https://player.vimeo.com/video/VIDEO_ID
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="order" class="form-label">Ders Sırası</label>
+                                <input type="number" class="form-control" id="order" name="order" value="{{ lesson.order }}" min="1">
+                                <div class="form-text">Dersin gösterileceği sıra numarası</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="duration" class="form-label">Süre (opsiyonel)</label>
+                                <input type="text" class="form-control" id="duration" name="duration" value="{{ lesson.duration }}" placeholder="örn: 10:30">
+                                <div class="form-text">Video süresi (örn: 45:30)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Dersi Güncelle</button>
+                            <a href="{{ url_for('courses.detail', course_id=course._id) }}" class="btn btn-outline-secondary">İptal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

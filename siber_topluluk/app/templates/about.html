@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Hakkımızda - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12 text-center mb-5">
+            <h1 class="display-4">Siber Topluluk Hakkında</h1>
+            <p class="lead">Siber güvenlik alanında eğitim ve farkındalık oluşturmayı hedefleyen bir topluluk</p>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Misyonumuz</h2>
+                    <p class="card-text">
+                        Siber Topluluk olarak, bilgi güvenliği konusundaki bilgi ve deneyimlerimizi paylaşarak, 
+                        siber güvenlik alanında farkındalık yaratmayı ve eğitimler düzenleyerek yeni yetenekler 
+                        kazandırmayı hedefliyoruz.
+                    </p>
+                    <p>
+                        Bilgi teknolojileri ve güvenliğine ilgi duyan herkesin kolayca erişebileceği bir topluluk 
+                        olmayı, açık kaynak felsefesini benimseyerek bilginin özgürce paylaşılmasını ve toplumsal 
+                        gelişime katkı sağlamayı amaçlıyoruz.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Vizyonumuz</h2>
+                    <p class="card-text">
+                        Türkiye'nin siber güvenlik farkındalığını artırarak, bilgi güvenliği konusunda daha bilinçli 
+                        bir toplum oluşturmak için öncü olmayı hedefliyoruz.
+                    </p>
+                    <p>
+                        Düzenlediğimiz etkinlikler, eğitimler ve yarışmalarla siber güvenlik alanında kariyer yapmak 
+                        isteyen gençleri destekleyerek, Türkiye'nin siber güvenlik ekosistemine katkıda bulunmayı 
+                        ve uluslararası alanda rekabet edebilecek uzmanlar yetiştirmeyi amaçlıyoruz.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Neler Yapıyoruz?</h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                            </div>
+                            <h4 class="text-center">Eğitimler</h4>
+                            <p class="text-center">
+                                Başlangıç seviyesinden ileri seviyeye kadar siber güvenlik 
+                                eğitimleri düzenliyoruz.
+                            </p>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-flag fa-3x text-primary"></i>
+                            </div>
+                            <h4 class="text-center">CTF Etkinlikleri</h4>
+                            <p class="text-center">
+                                Capture The Flag yarışmaları düzenleyerek eğlenceli bir öğrenme 
+                                ortamı sağlıyoruz.
+                            </p>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-users fa-3x text-primary"></i>
+                            </div>
+                            <h4 class="text-center">Topluluk Buluşmaları</h4>
+                            <p class="text-center">
+                                Siber güvenlik meraklılarını bir araya getirerek deneyim 
+                                paylaşımına olanak tanıyoruz.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Katılım ve İletişim</h2>
+                    <p>
+                        Siber Topluluk, herkesin katılımına açık bir topluluktur. Bilgi güvenliği konusunda bilgi 
+                        sahibi olmak, bu alanda kendinizi geliştirmek veya deneyimlerinizi paylaşmak istiyorsanız, 
+                        topluluğumuza katılabilirsiniz.
+                    </p>
+                    <p>
+                        Etkinliklerimiz, eğitimlerimiz ve projelerimiz hakkında detaylı bilgi almak için 
+                        <a href="{{ url_for('main.contact') }}">iletişim</a> sayfamızı ziyaret edebilir veya 
+                        sosyal medya hesaplarımızı takip edebilirsiniz.
+                    </p>
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary mx-2">Topluluğa Katıl</a>
+                        <a href="{{ url_for('main.contact') }}" class="btn btn-outline-primary mx-2">İletişime Geç</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

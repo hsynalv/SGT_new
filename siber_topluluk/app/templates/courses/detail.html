@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ course.title }}</h1>
+            {% if course.instructor %}
+            <p class="lead">Eğitmen: {{ course.instructor }}</p>
+            {% endif %}
+        </div>
+        <div class="col-md-4 text-end">
+            {% if current_user.is_admin %}
+            <div class="btn-group">
+                <a href="{{ url_for('courses.edit', course_id=course._id) }}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-edit"></i> Düzenle
+                </a>
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCourseModal">
+                    <i class="fas fa-trash"></i> Sil
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Kurs Bilgileri -->
+            <div class="card mb-4">
+                {% if course.image_url %}
+                <img src="{{ course.image_url }}" class="card-img-top" alt="{{ course.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">Kurs Hakkında</h5>
+                    <p class="card-text">{{ course.description }}</p>
+                    
+                    {% if course.level %}
+                    <div class="mb-3">
+                        <strong>Seviye:</strong> 
+                        <span class="badge bg-info">{{ course.level }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if course.tags %}
+                    <div class="mb-3">
+                        <strong>Etiketler:</strong> 
+                        {% for tag in course.tags %}
+                        <span class="badge bg-secondary me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Kayıt Durumu -->
+                    {% if current_user.is_authenticated and current_user.is_member %}
+                        {% if enrollment %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i> Bu kursa kayıtlısınız.
+                                <div class="progress mt-2">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ enrollment.progress }}%;" 
+                                        aria-valuenow="{{ enrollment.progress }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ enrollment.progress }}%
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <form action="{{ url_for('courses.enroll', course_id=course._id) }}" method="post">
+                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                    <i class="fas fa-graduation-cap me-2"></i> Kursa Kaydol
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% elif not current_user.is_authenticated %}
+                        <div class="alert alert-info">
+                            Bu kursa kaydolmak için <a href="{{ url_for('auth.login') }}">giriş yapın</a> veya 
+                            <a href="{{ url_for('auth.register') }}">kayıt olun</a>.
+                        </div>
+                    {% elif not current_user.is_member %}
+                        <div class="alert alert-warning">
+                            Bu kursa kaydolmak için member rolüne sahip olmalısınız.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Ders Listesi -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Ders Listesi</h5>
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('courses.create_lesson', course_id=course._id) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Ders Ekle
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if lessons %}
+                        <div class="list-group">
+                            {% for lesson in lessons %}
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ lesson.order }}. {{ lesson.title }}</h5>
+                                        {% if lesson.duration %}
+                                            <small class="text-muted">{{ lesson.duration }}</small>
+                                        {% endif %}
+                                    </div>
+                                    {% if lesson.description %}
+                                        <p class="mb-1">{{ lesson.description }}</p>
+                                    {% endif %}
+                                    
+                                    <div class="mt-2">
+                                        {% if current_user.is_member and enrollment %}
+                                            <a href="{{ url_for('courses.lesson_detail', course_id=course._id, lesson_id=lesson._id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-play-circle me-1"></i> İzle
+                                            </a>
+                                        {% elif current_user.is_admin %}
+                                            <a href="{{ url_for('courses.lesson_detail', course_id=course._id, lesson_id=lesson._id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-play-circle me-1"></i> İzle
+                                            </a>
+                                            <a href="{{ url_for('courses.edit_lesson', course_id=course._id, lesson_id=lesson._id) }}" class="btn btn-sm btn-outline-secondary me-1">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson._id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            
+                                            <!-- Ders Silme Modal -->
+                                            <div class="modal fade" id="deleteLessonModal{{ lesson._id }}" tabindex="-1" aria-labelledby="deleteLessonModalLabel{{ lesson._id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="deleteLessonModalLabel{{ lesson._id }}">Dersi Sil</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>"{{ lesson.title }}" dersini silmek istediğinize emin misiniz?</p>
+                                                            <p class="text-danger"><strong>Bu işlem geri alınamaz!</strong></p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                            <form action="{{ url_for('courses.delete_lesson', course_id=course._id, lesson_id=lesson._id) }}" method="post">
+                                                                <button type="submit" class="btn btn-danger">Dersi Sil</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted"><i class="fas fa-lock me-1"></i> Kursa kaydolunca erişilebilir</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            Bu kursa henüz ders eklenmemiştir.
+                            {% if current_user.is_admin %}
+                            <a href="{{ url_for('courses.create_lesson', course_id=course._id) }}" class="alert-link">İlk dersi eklemek için tıklayın.</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Kayıtlı Kullanıcı Sayısı -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Kayıtlı Öğrenciler</h5>
+                    <p class="display-4 mb-0">{{ enrolled_users_count|default(0) }}</p>
+                </div>
+            </div>
+            
+            <!-- Eğitmen Bilgisi -->
+            {% if course.instructor %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Eğitmen</h5>
+                    <p class="card-text">{{ course.instructor }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Diğer Popüler Kurslar -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Popüler Kurslar</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for i in range(3) %}
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Örnek Kurs {{ i+1 }}</h6>
+                                </div>
+                                <small class="text-muted">Kısa açıklama</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kurs Silme Modal -->
+<div class="modal fade" id="deleteCourseModal" tabindex="-1" aria-labelledby="deleteCourseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCourseModalLabel">Kursu Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <p>"{{ course.title }}" kursunu silmek istediğinize emin misiniz?</p>
+                <p class="text-danger"><strong>Bu işlem geri alınamaz ve tüm dersler ile kayıtlar da silinecektir!</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <form action="{{ url_for('courses.delete', course_id=course._id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Kursu Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ announcement.title }} - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('main.announcements') }}">Duyurular</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ announcement.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Duyuru İçeriği -->
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title mb-3">{{ announcement.title }}</h1>
+                    <p class="card-text text-muted mb-4">
+                        <small>
+                            <i class="far fa-calendar-alt"></i> {{ announcement.created_at.strftime('%d.%m.%Y') }}
+                        </small>
+                    </p>
+                    
+                    {% if announcement.image_url %}
+                    <div class="text-center mb-4">
+                        <img src="{{ announcement.image_url }}" class="img-fluid rounded" alt="{{ announcement.title }}">
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-text">
+                        {{ announcement.content|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Yan Panel -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    Son Duyurular
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% for recent_announcement in recent_announcements %}
+                            <li class="mb-2">
+                                <a href="{{ url_for('main.announcement_detail', announcement_id=recent_announcement._id) }}">
+                                    {{ recent_announcement.title }}
+                                </a>
+                                <br>
+                                <small class="text-muted">
+                                    {{ recent_announcement.created_at.strftime('%d.%m.%Y') }}
+                                </small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

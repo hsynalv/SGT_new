@@ -1,0 +1,256 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+{% if challenge %}CTF Görevi Düzenle{% else %}Yeni CTF Görevi Ekle{% endif %} - Siber Topluluk
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_panel.index') }}">Yönetim Paneli</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('ctf.admin_ctf') }}">CTF Görevleri</a></li>
+            <li class="breadcrumb-item active">{% if challenge %}Görevi Düzenle{% else %}Yeni Görev{% endif %}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas {% if challenge %}fa-edit{% else %}fa-plus{% endif %} me-2"></i>
+                        {% if challenge %}{{ challenge.title }} Düzenle{% else %}Yeni CTF Görevi Ekle{% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" 
+                          action="{% if challenge %}{{ url_for('ctf.admin_ctf_edit_challenge', challenge_id=challenge._id) }}{% else %}{{ url_for('ctf.admin_ctf_create_challenge') }}{% endif %}">
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Görev Başlığı <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ challenge.title if challenge else '' }}" required>
+                            <div class="form-text">Görevin benzersiz ve açıklayıcı bir başlığı olmalıdır.</div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="category" class="form-label">Kategori <span class="text-danger">*</span></label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="" disabled {% if not challenge %}selected{% endif %}>Kategori seçin</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.name }}" 
+                                            {% if challenge and challenge.category == category.name %}selected{% endif %}>
+                                        {{ category.name|capitalize }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="difficulty" class="form-label">Zorluk <span class="text-danger">*</span></label>
+                                <select class="form-select" id="difficulty" name="difficulty" required>
+                                    <option value="" disabled {% if not challenge %}selected{% endif %}>Zorluk seviyesi seçin</option>
+                                    {% for difficulty in difficulties %}
+                                    <option value="{{ difficulty.name }}" 
+                                            {% if challenge and challenge.difficulty == difficulty.name %}selected{% endif %}>
+                                        {{ difficulty.name|capitalize }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="points" class="form-label">Puan <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="points" name="points" 
+                                       value="{{ challenge.points if challenge else '' }}" min="10" max="1000" required>
+                                <div class="form-text">Görevin zorluğuna göre bir puan değeri (10-1000 arası).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="flag" class="form-label">Flag <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="flag" name="flag" 
+                                       value="{{ challenge.flag if challenge else '' }}" required>
+                                <div class="form-text">Örnek: CTF{bu_bir_flag_ornegi}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Açıklama <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="6" required>{{ challenge.description if challenge else '' }}</textarea>
+                            <div class="form-text">Markdown formatı desteklenmektedir. Görevin açıklamasını, çözüm yönergelerini ve ipuçlarını içermelidir.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="hints" class="form-label">İpuçları</label>
+                            <div id="hints-container">
+                                {% if challenge and challenge.hints %}
+                                    {% for hint in challenge.hints %}
+                                    <div class="input-group mb-2 hint-item">
+                                        <input type="text" class="form-control" name="hints[]" value="{{ hint }}">
+                                        <button type="button" class="btn btn-outline-danger remove-hint">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" id="add-hint">
+                                <i class="fas fa-plus me-1"></i>İpucu Ekle
+                            </button>
+                            <div class="form-text">İpuçları görevi çözmekte zorlanan kullanıcılara yardımcı olur.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="files" class="form-label">Dosyalar</label>
+                            <input type="file" class="form-control" id="files" name="files" multiple>
+                            <div class="form-text">Görev için gerekli olabilecek dosyaları ekleyin (maksimum 5 dosya, her biri en fazla 5MB).</div>
+                            
+                            {% if challenge and challenge.files %}
+                            <div class="mt-3">
+                                <p><strong>Mevcut Dosyalar:</strong></p>
+                                <ul class="list-group">
+                                    {% for file in challenge.files %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ file.name }}
+                                        <div class="btn-group">
+                                            <a href="{{ file.url }}" class="btn btn-sm btn-outline-primary" download>
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="document.getElementById('delete_file_{{ loop.index }}').value='1'">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <input type="hidden" id="delete_file_{{ loop.index }}" name="delete_file_{{ loop.index }}" value="0">
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="active" name="active" 
+                                   {% if not challenge or challenge.active %}checked{% endif %}>
+                            <label class="form-check-label" for="active">Aktif</label>
+                            <div class="form-text">İşaretlenirse, görev kullanıcılara görünür olacaktır.</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('ctf.admin_ctf') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>İptal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>{% if challenge %}Değişiklikleri Kaydet{% else %}Görevi Ekle{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Görev Yönetimi Bilgisi</h5>
+                </div>
+                <div class="card-body">
+                    <p>Etkili bir CTF görevi oluşturmak için aşağıdaki ipuçlarını göz önünde bulundurun:</p>
+                    <ul>
+                        <li><strong>Açık Talimatlar:</strong> Görev açıklaması net ve anlaşılır olmalıdır.</li>
+                        <li><strong>Doğru Zorluk:</strong> Görevin zorluk seviyesi ve puanı uyumlu olmalıdır.</li>
+                        <li><strong>Gerçek Dünya Bağlantısı:</strong> Gerçek dünya senaryolarına benzer görevler daha öğreticidir.</li>
+                        <li><strong>İpuçları:</strong> Kullanıcıların takıldığı noktalarda yol gösterici ipuçları ekleyin.</li>
+                    </ul>
+                    <p>Flag formatı standardı:</p>
+                    <code>CTF{benzersiz_bir_string}</code>
+                    <hr>
+                    <p class="mb-0"><strong>Not:</strong> Çözülmüş görevlerde değişiklik yapılırken, halihazırda çözmüş kullanıcıları etkileyebileceğini unutmayın.</p>
+                </div>
+            </div>
+            
+            {% if challenge %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Görev İstatistikleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Oluşturulma Tarihi:</span>
+                        <span>{{ challenge.created_at }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Son Güncelleme:</span>
+                        <span>{{ challenge.updated_at }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Çözüm Sayısı:</span>
+                        <span class="badge bg-primary">{{ challenge.solve_count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Çözüm Oranı:</span>
+                        <span>{{ challenge.solve_rate }}%</span>
+                    </div>
+                    
+                    <p class="fw-bold">İlk Çözen Kullanıcılar:</p>
+                    <ol class="list-group list-group-numbered">
+                        {% for user in challenge.first_solvers %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ user.username }}
+                            <span class="badge bg-success">{{ user.solved_at }}</span>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item">Henüz hiç kullanıcı çözmedi.</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // İpucu ekleme fonksiyonu
+    const hintsContainer = document.getElementById('hints-container');
+    const addHintButton = document.getElementById('add-hint');
+    
+    addHintButton.addEventListener('click', function() {
+        const hintItem = document.createElement('div');
+        hintItem.className = 'input-group mb-2 hint-item';
+        hintItem.innerHTML = `
+            <input type="text" class="form-control" name="hints[]" placeholder="İpucu ekleyin...">
+            <button type="button" class="btn btn-outline-danger remove-hint">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        hintsContainer.appendChild(hintItem);
+        
+        // İpucu silme butonu için event listener
+        hintItem.querySelector('.remove-hint').addEventListener('click', function() {
+            hintItem.remove();
+        });
+    });
+    
+    // Mevcut ipucu silme butonları için event listener
+    document.querySelectorAll('.remove-hint').forEach(button => {
+        button.addEventListener('click', function() {
+            this.closest('.hint-item').remove();
+        });
+    });
+    
+    // Markdown editörü (basit)
+    const descriptionTextarea = document.getElementById('description');
+    if (descriptionTextarea) {
+        // Burada bir markdown editörü entegrasyonu eklenebilir (örn. SimpleMDE, EasyMDE)
+        // Örnek: const easyMDE = new EasyMDE({ element: descriptionTextarea });
+    }
+});
+</script>
+{% endblock %} 

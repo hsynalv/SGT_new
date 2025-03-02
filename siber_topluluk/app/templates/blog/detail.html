@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ blog.title }}{% endblock %}
+
+{% block head %}
+<!-- Markdown ve kod bloğu stillerini ekle -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/github.min.css">
+<style>
+    .blog-content {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+    .blog-content img {
+        max-width: 100%;
+        height: auto;
+    }
+    .blog-content code {
+        padding: 0.2em 0.4em;
+        margin: 0;
+        font-size: 85%;
+        background-color: rgba(175, 184, 193, 0.2);
+        border-radius: 6px;
+    }
+    .blog-content pre {
+        background-color: #f6f8fa;
+        border-radius: 6px;
+        padding: 16px;
+        overflow: auto;
+    }
+    .blog-content pre code {
+        background-color: transparent;
+        padding: 0;
+    }
+    .blog-content blockquote {
+        padding: 0 1em;
+        color: #57606a;
+        border-left: 0.25em solid #d0d7de;
+    }
+    .blog-content table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 16px;
+    }
+    .blog-content table th,
+    .blog-content table td {
+        padding: 6px 13px;
+        border: 1px solid #d0d7de;
+    }
+    .blog-content table tr {
+        background-color: #ffffff;
+        border-top: 1px solid #d0d7de;
+    }
+    .blog-content table tr:nth-child(2n) {
+        background-color: #f6f8fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('blog.index') }}">Blog</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ blog.title|truncate(30) }}</li>
+                </ol>
+            </nav>
+            
+            <!-- Blog Post -->
+            <article class="card shadow mb-4">
+                {% if blog.image_url %}
+                <img src="{{ blog.image_url }}" class="card-img-top" alt="{{ blog.title }}">
+                {% endif %}
+                
+                <div class="card-body">
+                    <h1 class="card-title mb-3">{{ blog.title }}</h1>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center text-muted small">
+                            <i class="fas fa-user-circle me-1"></i>
+                            <span>{{ blog.author_name }}</span>
+                            <span class="mx-2">·</span>
+                            <i class="far fa-calendar-alt me-1"></i>
+                            <span>{{ blog.created_at.strftime('%d.%m.%Y') }}</span>
+                            <span class="mx-2">·</span>
+                            <i class="far fa-eye me-1"></i>
+                            <span>{{ blog.views }} görüntülenme</span>
+                        </div>
+                        
+                        <div>
+                            {% if current_user.is_authenticated and (current_user.get_id() == blog.author_id|string or current_user.is_admin) %}
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{{ url_for('blog.edit', blog_id=blog._id) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit me-1"></i>Düzenle
+                                </a>
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    <i class="fas fa-trash me-1"></i>Sil
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        {% for tag in blog.tags %}
+                        <span class="badge bg-secondary me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="blog-content mb-4">
+                        {{ blog.content_html|safe }}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <span class="me-3">
+                                <i class="far fa-thumbs-up me-1"></i>
+                                {{ blog.likes|length }} beğeni
+                            </span>
+                        </div>
+                        
+                        {% if current_user.is_authenticated %}
+                        <form action="{{ url_for('blog.like', blog_id=blog._id) }}" method="POST">
+                            <button type="submit" class="btn btn-sm {% if current_user.get_id() in blog.likes %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                <i class="{% if current_user.get_id() in blog.likes %}fas{% else %}far{% endif %} fa-thumbs-up me-1"></i>
+                                {% if current_user.get_id() in blog.likes %}Beğenildi{% else %}Beğen{% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Author Bio -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-user-circle me-2 text-primary"></i>Yazar Hakkında</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-user-circle fa-3x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5>{{ blog.author_name }}</h5>
+                            <p class="text-muted mb-2">Siber Topluluk Üyesi</p>
+                            <a href="{{ url_for('blog.user_blogs', user_id=blog.author_id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-book me-1"></i>Yazarın Diğer Yazıları
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="d-flex justify-content-between mb-4">
+                <a href="{{ url_for('blog.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Tüm Yazılar
+                </a>
+                
+                {% if current_user.is_authenticated and current_user.is_member %}
+                <a href="{{ url_for('blog.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i>Yeni Yazı Oluştur
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+{% if current_user.is_authenticated and (current_user.get_id() == blog.author_id|string or current_user.is_admin) %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yazıyı Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>"{{ blog.title }}" başlıklı yazıyı silmek istediğinize emin misiniz?</p>
+                <p class="text-danger">Bu işlem geri alınamaz!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <form action="{{ url_for('blog.delete', blog_id=blog._id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<!-- Kod bloklarını renklendirme için highlight.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tüm kod bloklarını otomatik olarak renklendir
+        document.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+        });
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Kullanıcı Yönetimi - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_panel.index') }}">Admin Paneli</a></li>
+            <li class="breadcrumb-item active">Kullanıcı Yönetimi</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1>Kullanıcı Yönetimi</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <form class="d-flex" method="GET" action="{{ url_for('admin_panel.users') }}">
+                <input class="form-control me-2" type="search" name="search" placeholder="Kullanıcı ara..." aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Ara</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kullanıcı Adı</th>
+                            <th>E-posta</th>
+                            <th>Rol</th>
+                            <th>Kayıt Tarihi</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ loop.index + ((page - 1) * 10) }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="badge {% if user.is_admin %}bg-danger{% elif user.is_member %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ user.role }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if user.created_at %}
+                                <span class="format-date">{{ user.created_at }}</span>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('admin_panel.edit_user_role', user_id=user._id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-user-tag"></i> Rol
+                                    </a>
+                                    {% if current_user._id != user._id %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user._id }}">
+                                        <i class="fas fa-trash"></i> Sil
+                                    </button>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Kullanıcı Silme Modal -->
+                                <div class="modal fade" id="deleteUserModal{{ user._id }}" tabindex="-1" aria-labelledby="deleteUserModalLabel{{ user._id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteUserModalLabel{{ user._id }}">Kullanıcı Sil</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>"{{ user.username }}" kullanıcısını silmek istediğinize emin misiniz?</p>
+                                                <p class="text-danger"><strong>Bu işlem geri alınamaz ve kullanıcıya ait tüm içerikler silinecektir!</strong></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                <form action="{{ url_for('admin_panel.delete_user', user_id=user._id) }}" method="post">
+                                                    <button type="submit" class="btn btn-danger">Kullanıcıyı Sil</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sayfalama -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <nav aria-label="Kullanıcı sayfaları">
+                <ul class="pagination justify-content-center">
+                    {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_panel.users', page=page-1) }}" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for p in range(1, total_pages + 1) %}
+                        {% if p == page %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ p }}</a></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('admin_panel.users', page=p) }}">{{ p }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page < total_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_panel.users', page=page+1) }}" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %} 

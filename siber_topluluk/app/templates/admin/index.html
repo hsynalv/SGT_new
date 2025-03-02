@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1>Admin Paneli</h1>
+            <p class="lead">Siber Topluluk yönetim paneline hoş geldiniz.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card admin-dashboard-card">
+                <div class="card-body">
+                    <i class="fas fa-users"></i>
+                    <h5 class="card-title">Kullanıcılar</h5>
+                    <p class="count">{{ user_count }}</p>
+                    <a href="{{ url_for('admin_panel.users') }}" class="btn btn-primary">Kullanıcıları Yönet</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card admin-dashboard-card">
+                <div class="card-body">
+                    <i class="fas fa-blog"></i>
+                    <h5 class="card-title">Blog Yazıları</h5>
+                    <p class="count">{{ blog_count }}</p>
+                    <a href="{{ url_for('admin_panel.blogs') }}" class="btn btn-primary">Blog Yazılarını Yönet</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card admin-dashboard-card">
+                <div class="card-body">
+                    <i class="fas fa-bullhorn"></i>
+                    <h5 class="card-title">Duyurular</h5>
+                    <p class="count">{{ announcement_count }}</p>
+                    <a href="{{ url_for('admin_panel.announcements') }}" class="btn btn-primary">Duyuruları Yönet</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Kurslar</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ course_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-graduation-cap fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ url_for('admin_panel.courses') }}" class="stretched-link"></a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                CTF Görevleri</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ ctf_challenge_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-flag fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ url_for('ctf.admin_ctf') }}" class="stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="m-0 font-weight-bold text-primary">Hızlı İşlemler</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <a href="{{ url_for('admin_panel.blogs') }}" class="btn btn-primary btn-block">
+                        <i class="fas fa-plus me-2"></i>Yeni Blog Yazısı
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <a href="{{ url_for('admin_panel.create_announcement') }}" class="btn btn-success btn-block">
+                        <i class="fas fa-plus me-2"></i>Yeni Duyuru
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <a href="{{ url_for('admin_panel.courses') }}" class="btn btn-info btn-block">
+                        <i class="fas fa-plus me-2"></i>Yeni Kurs
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <a href="{{ url_for('ctf.admin_ctf_create_challenge') }}" class="btn btn-danger btn-block">
+                        <i class="fas fa-plus me-2"></i>Yeni CTF Görevi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Son Kullanıcı Etkinlikleri</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Kullanıcı1</strong> bir blog yazısı oluşturdu
+                                <small class="d-block text-muted">Bugün, 14:30</small>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Görüntüle</a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Kullanıcı2</strong> bir kursa kaydoldu
+                                <small class="d-block text-muted">Dün, 16:45</small>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Görüntüle</a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Kullanıcı3</strong> kayıt oldu
+                                <small class="d-block text-muted">2 gün önce</small>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Görüntüle</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sistem Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Uygulama Versiyonu:</strong> 1.0.0</p>
+                    <p><strong>Son Güncelleme:</strong> {{ now.strftime('%d.%m.%Y') }}</p>
+                    <p><strong>Veritabanı Durumu:</strong> <span class="badge bg-success">Çalışıyor</span></p>
+                    <p><strong>Disk Kullanımı:</strong> 2.4 GB / 10 GB</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

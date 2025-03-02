@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Kullanıcı Rolü Düzenle - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_panel.index') }}">Admin Paneli</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_panel.users') }}">Kullanıcılar</a></li>
+            <li class="breadcrumb-item active">Kullanıcı Rolü Düzenle</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Kullanıcı Rolü Düzenle</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Kullanıcı Bilgileri</h5>
+                        <p><strong>Kullanıcı Adı:</strong> {{ user.username }}</p>
+                        <p><strong>E-posta:</strong> {{ user.email }}</p>
+                        <p>
+                            <strong>Mevcut Rol:</strong> 
+                            <span class="badge {% if user.is_admin %}bg-danger{% elif user.is_member %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ user.role }}
+                            </span>
+                        </p>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('admin_panel.edit_user_role', user_id=user._id) }}">
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Yeni Rol</label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="{{ roles.USER }}" {% if user.role == roles.USER %}selected{% endif %}>
+                                    User (Temel Kullanıcı) - Blog yazıları oluşturabilir
+                                </option>
+                                <option value="{{ roles.MEMBER }}" {% if user.role == roles.MEMBER %}selected{% endif %}>
+                                    Member (Üye) - Eğitimlere erişebilir, blog yazıları oluşturabilir
+                                </option>
+                                <option value="{{ roles.ADMIN }}" {% if user.role == roles.ADMIN %}selected{% endif %}>
+                                    Admin (Yönetici) - Tam yetki
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Rol Açıklamaları:</h6>
+                            <ul class="small">
+                                <li><strong>User (Temel Kullanıcı):</strong> Sadece blog yazıları oluşturabilir, düzenleyebilir ve silebilir. Eğitimlere erişemez.</li>
+                                <li><strong>Member (Üye):</strong> Blog yazıları oluşturabilir ve eğitimlere erişebilir.</li>
+                                <li><strong>Admin (Yönetici):</strong> Tüm içeriklere erişebilir, kullanıcıları yönetebilir, eğitim ekleyebilir, blogları silebilir ve diğer tüm yönetim işlemlerini yapabilir.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Rolü Güncelle</button>
+                            <a href="{{ url_for('admin_panel.users') }}" class="btn btn-outline-secondary">İptal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

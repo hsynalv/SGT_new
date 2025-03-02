@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog Yazısı Oluştur{% endblock %}
+
+{% block head %}
+<!-- TinyMCE CDN -->
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0"><i class="fas fa-pen-fancy me-2"></i>Yeni Blog Yazısı Oluştur</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Başlık <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Etiketler (virgülle ayırın)</label>
+                            <input type="text" class="form-control" id="tags" name="tags" placeholder="örnek: siber güvenlik, CTF, yazılım">
+                            <div class="form-text text-muted">Etiketler, içeriğinizin daha kolay bulunmasını sağlar.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Kapak Görseli</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            <div class="form-text text-muted">Önerilen boyut: 1200x600 piksel. Maksimum dosya boyutu: 5MB.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="content" class="form-label">İçerik <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="content" name="content" rows="12" required></textarea>
+                            <div class="form-text text-muted">Markdown ve HTML formatları desteklenmektedir.</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('blog.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>İptal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Yazıyı Yayınla
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>İpuçları</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Başlığınız kısa ve dikkat çekici olmalıdır.</li>
+                        <li>İçeriğinizi bölümlere ayırın ve alt başlıklar kullanın.</li>
+                        <li>Görsellerle içeriğinizi zenginleştirin.</li>
+                        <li>Teknik içerikler için kod örnekleri ekleyin.</li>
+                        <li>Kaynaklarınızı belirtin ve bağlantılar ekleyin.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    tinymce.init({
+        selector: '#content',
+        plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+        toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+        toolbar_sticky: true,
+        autosave_ask_before_unload: true,
+        autosave_interval: '30s',
+        autosave_prefix: '{path}{query}-{id}-',
+        autosave_restore_when_empty: false,
+        autosave_retention: '2m',
+        image_advtab: true,
+        height: 500,
+        quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+        noneditable_class: 'mceNonEditable',
+        toolbar_mode: 'sliding',
+        contextmenu: 'link image table',
+        skin: 'oxide',
+        content_css: 'default',
+        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; font-size: 16px; }',
+        language: 'tr',
+        branding: false,
+        placeholder: 'İçeriğinizi buraya yazın...',
+        promotion: false
+    });
+</script>
+{% endblock %}
+
+{% endblock %} 

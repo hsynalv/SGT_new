@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} Düzenle - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('courses.index') }}">Eğitimler</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('courses.detail', course_id=course._id) }}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item active">Düzenle</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Kurs Düzenle</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('courses.edit', course_id=course._id) }}" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Kurs Başlığı</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ course.title }}" required>
+                            <div class="invalid-feedback">
+                                Lütfen bir kurs başlığı girin.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Kurs Açıklaması</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" required>{{ course.description }}</textarea>
+                            <div class="invalid-feedback">
+                                Lütfen bir kurs açıklaması girin.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image_url" class="form-label">Resim URL'si (opsiyonel)</label>
+                            <input type="url" class="form-control" id="image_url" name="image_url" value="{{ course.image_url or '' }}">
+                            <div class="form-text">Kurs kapak görselinin URL'si</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="instructor" class="form-label">Eğitmen</label>
+                                <input type="text" class="form-control" id="instructor" name="instructor" value="{{ course.instructor or '' }}">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="level" class="form-label">Seviye</label>
+                                <select class="form-select" id="level" name="level">
+                                    <option value="">Seviye Seçin</option>
+                                    <option value="Başlangıç" {% if course.level == 'Başlangıç' %}selected{% endif %}>Başlangıç</option>
+                                    <option value="Orta" {% if course.level == 'Orta' %}selected{% endif %}>Orta</option>
+                                    <option value="İleri" {% if course.level == 'İleri' %}selected{% endif %}>İleri</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Etiketler (virgülle ayırın)</label>
+                            <input type="text" class="form-control" id="tags" name="tags" placeholder="örn: web güvenliği, ctf, network" value="{{ course.tags|join(', ') if course.tags else '' }}">
+                            <div class="form-text">Kursu kategorize etmek için etiketler ekleyin</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Kursu Güncelle</button>
+                            <a href="{{ url_for('courses.detail', course_id=course._id) }}" class="btn btn-outline-secondary">İptal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form doğrulama için Bootstrap kodu
+    (function() {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %} 

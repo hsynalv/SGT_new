@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}CTF Profili - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('ctf.index') }}">CTF Platformu</a></li>
+            <li class="breadcrumb-item active">Profilim</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <!-- Kullanıcı Profil Kartı -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>CTF Profili</h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="{{ user.avatar if user.avatar else url_for('static', filename='img/default-avatar.png') }}" 
+                         class="rounded-circle mb-3" width="120" height="120" alt="{{ user.username }}">
+                    <h4>{{ user.username }}</h4>
+                    <div class="d-flex justify-content-center mb-3">
+                        {% for badge in badges %}
+                        <span class="badge {{ badge.color if badge.color else 'bg-secondary' }} mx-1" data-bs-toggle="tooltip" title="{{ badge.name }}">
+                            <i class="{{ badge.icon if badge.icon else 'fas fa-award' }}"></i>
+                        </span>
+                        {% endfor %}
+                    </div>
+                    <p class="text-muted">Üyelik: {{ user.created_at|default('Bilinmiyor') }}</p>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h5 class="mb-0">{{ solved_challenges|length }}</h5>
+                            <small class="text-muted">Çözülen</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="mb-0">{{ total_points }}</h5>
+                            <small class="text-muted">Puan</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="mb-0">{{ badges|length }}</h5>
+                            <small class="text-muted">Rozet</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('ctf.scoreboard') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-trophy me-2"></i>Puan Tablosu
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Kategori İstatistikleri -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Kategori İstatistikleri</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" width="100%" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <!-- Başarı Rozetleri -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-award me-2"></i>Başarı Rozetleri</h5>
+                </div>
+                <div class="card-body">
+                    {% if badges %}
+                    <div class="row">
+                        {% for badge in badges %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <div class="badge-icon mb-3">
+                                        <span class="badge {{ badge.color if badge.color else 'bg-secondary' }} p-3 rounded-circle">
+                                            <i class="{{ badge.icon if badge.icon else 'fas fa-award' }} fa-2x"></i>
+                                        </span>
+                                    </div>
+                                    <h5>{{ badge.name }}</h5>
+                                    <p class="small text-muted">{{ badge.description }}</p>
+                                    <small class="text-muted">{{ badge.earned_at }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>Henüz hiç rozetiniz yok. Görevleri çözerek rozetler kazanabilirsiniz!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Çözülen Görevler -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Çözülen Görevler</h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-primary active" id="btnAllSolved">Tümü</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnRecentSolved">Son Çözülenler</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if solved_challenges %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Görev</th>
+                                    <th>Kategori</th>
+                                    <th>Zorluk</th>
+                                    <th>Puan</th>
+                                    <th>Çözüm Tarihi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for challenge in solved_challenges %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('ctf.challenge_detail', challenge_id=challenge._id) }}">
+                                            {{ challenge.title }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ challenge.category|default('secondary') }}">
+                                            {{ challenge.category|capitalize }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if challenge.difficulty == 'kolay' %}bg-success{% elif challenge.difficulty == 'orta' %}bg-warning text-dark{% elif challenge.difficulty == 'zor' %}bg-danger{% else %}bg-dark{% endif %}">
+                                            {{ challenge.difficulty|capitalize }}
+                                        </span>
+                                    </td>
+                                    <td>{{ challenge.points }}</td>
+                                    <td>{{ challenge.solved_at }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>Henüz hiç görev çözmediniz. <a href="{{ url_for('ctf.challenges') }}">Görevlere göz atın</a> ve ilk çözümünüzü yapın!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Bootstrap tooltips için
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Kategori istatistikleri grafiği
+    const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+    
+    const categoryData = {
+        labels: [{% for cat, count in category_stats.items() %}'{{ cat|capitalize }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Çözülen Görevler',
+            data: [{% for cat, count in category_stats.items() %}{{ count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: [
+                '#4e73df', // web
+                '#1cc88a', // crypto
+                '#36b9cc', // forensics
+                '#f6c23e', // reverse
+                '#e74a3b', // pwnable
+                '#858796'  // misc
+            ],
+            borderWidth: 1
+        }]
+    };
+    
+    const categoryChart = new Chart(ctxCategory, {
+        type: 'doughnut',
+        data: categoryData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+    
+    // Son çözülenler / Tümü butonları için
+    document.getElementById('btnRecentSolved').addEventListener('click', function() {
+        this.classList.add('active');
+        document.getElementById('btnAllSolved').classList.remove('active');
+        // Burada AJAX ile son çözülenleri getirme işlemi yapılabilir
+    });
+    
+    document.getElementById('btnAllSolved').addEventListener('click', function() {
+        this.classList.add('active');
+        document.getElementById('btnRecentSolved').classList.remove('active');
+        // Burada AJAX ile tüm çözülenleri getirme işlemi yapılabilir
+    });
+});
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .badge.bg-web { background-color: #4e73df; }
+    .badge.bg-crypto { background-color: #1cc88a; }
+    .badge.bg-forensics { background-color: #36b9cc; }
+    .badge.bg-reverse { background-color: #f6c23e; }
+    .badge.bg-pwnable { background-color: #e74a3b; }
+    .badge.bg-misc { background-color: #858796; }
+    
+    .badge-icon .badge {
+        width: 64px;
+        height: 64px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %} 

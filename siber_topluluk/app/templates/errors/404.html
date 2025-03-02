@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Sayfa Bulunamadı - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="display-1">404</h1>
+            <h2 class="mb-4">Sayfa Bulunamadı</h2>
+            <p class="lead mb-5">Aradığınız sayfa bulunamadı veya taşınmış olabilir.</p>
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">Ana Sayfaya Dön</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

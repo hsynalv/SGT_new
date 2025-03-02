@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}CTF Platformu - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="jumbotron bg-primary text-white p-4 rounded">
+        <div class="container">
+            <h1 class="display-4"><i class="fas fa-flag me-3"></i>CTF Platformu</h1>
+            <p class="lead">Siber güvenlik becerilerinizi geliştirmek için CTF görevlerini çözün, puanlar kazanın ve rozetler toplayın!</p>
+            
+            {% if current_user.is_authenticated %}
+                {% if current_user.is_member %}
+                <div class="mt-4">
+                    <a href="{{ url_for('ctf.challenges') }}" class="btn btn-light btn-lg me-2">
+                        <i class="fas fa-tasks me-2"></i>Görevleri Görüntüle
+                    </a>
+                    <a href="{{ url_for('ctf.scoreboard') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-trophy me-2"></i>Puan Tablosu
+                    </a>
+                </div>
+                {% else %}
+                <div class="alert alert-warning mt-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>CTF platformuna erişmek için üyelik seviyenizi yükseltmeniz gerekmektedir.
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="mt-4">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-light btn-lg me-2">
+                        <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Kayıt Ol
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Siber Güvenlik Zorlukları</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">CTF (Capture The Flag), siber güvenlik becerilerinizi pratik yaparak geliştirmenizi sağlayan bir platformdur.</p>
+                    <p>Farklı kategorilerde ve zorluklarda hazırlanmış görevleri çözerek puanlar kazanın, sıralamalarda yükselin ve özel rozetler elde edin.</p>
+                    
+                    <hr class="my-4">
+                    
+                    <h4><i class="fas fa-list-alt me-2"></i>Platformda Neler Var?</h4>
+                    <ul class="list-group mt-3">
+                        <li class="list-group-item">
+                            <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                            <strong>Eğitici İçerik:</strong> Her görev gerçek dünya siber güvenlik senaryolarına dayanır.
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-tag me-2 text-success"></i>
+                            <strong>Çeşitli Kategoriler:</strong> Web, Kriptografi, Adli Bilişim, Tersine Mühendislik ve daha fazlası!
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-signal me-2 text-warning"></i>
+                            <strong>Farklı Zorluk Seviyeleri:</strong> Başlangıç seviyesinden uzmanlığa kadar herkes için uygun görevler.
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-users me-2 text-danger"></i>
+                            <strong>Rekabetçi Ortam:</strong> Diğer kullanıcılarla yarışın ve sıralamalarda yerinizi alın.
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-award me-2 text-info"></i>
+                            <strong>Rozetler ve Ödüller:</strong> Başarılarınızı gösteren özel rozetler kazanın.
+                        </li>
+                    </ul>
+                    
+                    {% if not current_user.is_authenticated %}
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Hemen Başlayın
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- İstatistikler -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-chart-bar me-2"></i>İstatistikler</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span><i class="fas fa-tasks me-2 text-primary"></i>Toplam Görev:</span>
+                        <span class="badge bg-primary rounded-pill">{{ stats.total_challenges }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span><i class="fas fa-check-circle me-2 text-success"></i>Doğru Çözümler:</span>
+                        <span class="badge bg-success rounded-pill">{{ stats.total_solves }}</span>
+                    </div>
+                    {% if current_user.is_authenticated and current_user.is_member %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span><i class="fas fa-user-check me-2 text-info"></i>Çözdüğünüz:</span>
+                        <span class="badge bg-info rounded-pill">{{ stats.user_solves }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-award me-2 text-warning"></i>Puanınız:</span>
+                        <span class="badge bg-warning text-dark rounded-pill">{{ stats.user_points }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-grid">
+                        <a href="{{ url_for('ctf.profile') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-user-shield me-2"></i>CTF Profilim
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Kategoriler -->
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="fas fa-tags me-2"></i>Kategoriler</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-web p-2 me-2"><i class="fas fa-globe"></i></span>
+                                <span>Web</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-crypto p-2 me-2"><i class="fas fa-key"></i></span>
+                                <span>Kriptografi</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-forensics p-2 me-2"><i class="fas fa-search"></i></span>
+                                <span>Adli Bilişim</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-reverse p-2 me-2"><i class="fas fa-undo"></i></span>
+                                <span>Tersine Müh.</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-pwnable p-2 me-2"><i class="fas fa-bomb"></i></span>
+                                <span>Pwnable</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-misc p-2 me-2"><i class="fas fa-puzzle-piece"></i></span>
+                                <span>Çeşitli</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .badge.bg-web { background-color: #4e73df; }
+    .badge.bg-crypto { background-color: #1cc88a; }
+    .badge.bg-forensics { background-color: #36b9cc; }
+    .badge.bg-reverse { background-color: #f6c23e; }
+    .badge.bg-pwnable { background-color: #e74a3b; }
+    .badge.bg-misc { background-color: #858796; }
+</style>
+{% endblock %} 

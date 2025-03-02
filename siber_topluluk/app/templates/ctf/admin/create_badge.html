@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Yeni Rozet Oluştur - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_panel.index') }}">Admin Paneli</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('ctf.admin_ctf') }}">CTF Yönetimi</a></li>
+            <li class="breadcrumb-item active">Yeni Rozet Oluştur</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Yeni Rozet Oluştur</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('ctf.admin_ctf_create_badge') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Rozet Adı <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Rozet Açıklaması <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="image_url" class="form-label">Resim URL</label>
+                                    <input type="text" class="form-control" id="image_url" name="image_url" placeholder="https://örnek.com/rozet.png">
+                                    <div class="form-text">Rozet için bir resim URL'si girin (opsiyonel).</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="criteria_type" class="form-label">Kriter Türü <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="criteria_type" name="criteria_type" required>
+                                        <option value="">Kriter Türü Seçin</option>
+                                        <option value="min_points">Minimum Puan</option>
+                                        <option value="challenge_count">Görev Sayısı</option>
+                                        <option value="category">Kategori Bazlı</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3 criteria-field" id="min_points_field" style="display: none;">
+                                    <label for="criteria_value" class="form-label">Minimum Puan <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="min_points_value" name="criteria_value" min="50" step="10" value="100">
+                                    <div class="form-text">Kullanıcının bu rozeti kazanması için ulaşması gereken minimum puan.</div>
+                                </div>
+                                
+                                <div class="mb-3 criteria-field" id="challenge_count_field" style="display: none;">
+                                    <label for="criteria_value" class="form-label">Görev Sayısı <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="challenge_count_value" name="criteria_value" min="1" step="1" value="3">
+                                    <div class="form-text">Kullanıcının bu rozeti kazanması için çözmesi gereken görev sayısı.</div>
+                                </div>
+                                
+                                <div class="mb-3 criteria-field" id="category_field" style="display: none;">
+                                    <label for="criteria_value" class="form-label">Kategori <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="category_value" name="criteria_value">
+                                        <option value="">Kategori Seçin</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category }}">{{ category }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">Kullanıcının bu rozeti kazanması için en az bir görevi çözmesi gereken kategori.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('ctf.admin_ctf') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>İptal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Rozeti Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Kriter türü seçimine göre ilgili alanı göster
+        const criteriaTypeSelect = document.getElementById('criteria_type');
+        const criteriaFields = document.querySelectorAll('.criteria-field');
+        
+        criteriaTypeSelect.addEventListener('change', function() {
+            // Tüm kriter alanlarını gizle
+            criteriaFields.forEach(field => {
+                field.style.display = 'none';
+            });
+            
+            // Seçilen kriter türüne göre ilgili alanı göster
+            const selectedValue = this.value;
+            if (selectedValue) {
+                const selectedField = document.getElementById(`${selectedValue}_field`);
+                if (selectedField) {
+                    selectedField.style.display = 'block';
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

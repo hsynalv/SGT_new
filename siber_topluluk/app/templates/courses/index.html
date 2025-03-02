@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Eğitimler - Siber Topluluk{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Eğitimler</h1>
+            <p class="lead">Siber güvenlik ve teknoloji alanlarında kendinizi geliştirin.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if current_user.is_admin %}
+            <a href="{{ url_for('courses.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Yeni Kurs Ekle
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        {% if courses %}
+            {% for course in courses %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if course.image_url %}
+                    <img src="{{ course.image_url }}" class="card-img-top" alt="{{ course.title }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/350x200?text=Kurs" class="card-img-top" alt="Kurs">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text">{{ course.description|truncate(150) }}</p>
+                        
+                        {% if course.level %}
+                        <div class="mb-2">
+                            <span class="badge bg-info">{{ course.level }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if course.tags %}
+                        <div class="mb-3">
+                            {% for tag in course.tags %}
+                            <span class="badge bg-secondary me-1">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{{ url_for('courses.detail', course_id=course._id) }}" class="btn btn-primary w-100">
+                            Detayları Gör
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    Henüz kurs bulunmamaktadır.
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('courses.create') }}" class="alert-link">İlk kursu oluşturmak için tıklayın.</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Sayfalama -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <nav aria-label="Kurs sayfaları">
+                <ul class="pagination justify-content-center">
+                    {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('courses.index', page=page-1) }}" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for p in range(1, 6) %}
+                        {% if p == page %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ p }}</a></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('courses.index', page=p) }}">{{ p }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('courses.index', page=page+1) }}" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-4">
+            <!-- Profil kartı -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-circle me-2"></i>Profil Bilgileri</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle fa-5x text-primary"></i>
+                    </div>
+                    <h5 class="my-2">{{ current_user.username }}</h5>
+                    <p class="text-muted mb-2">{{ current_user.email }}</p>
+                    <p class="mb-2">
+                        {% if current_user.is_admin %}
+                        <span class="badge bg-danger">Admin</span>
+                        {% elif current_user.is_member %}
+                        <span class="badge bg-success">Üye</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Ziyaretçi</span>
+                        {% endif %}
+                    </p>
+                    <p class="mb-2">Kayıt: {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
+                    <div class="mt-3">
+                        <a href="{{ url_for('auth.edit_profile') }}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-user-edit me-1"></i>Profili Düzenle
+                        </a>
+                        <a href="{{ url_for('auth.change_password') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-key me-1"></i>Şifre Değiştir
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <!-- Kullanıcı aktiviteleri -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Aktivitelerim</h4>
+                </div>
+                <div class="card-body">
+                    <!-- CTF Kartı -->
+                    <div class="border rounded p-3 mb-3">
+                        <h5 class="text-primary mb-3"><i class="fas fa-flag me-2"></i>CTF Platformu</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <a href="{{ url_for('ctf.profile') }}" class="d-block p-3 border rounded text-center text-decoration-none">
+                                    <i class="fas fa-trophy fa-2x text-warning mb-2"></i>
+                                    <p class="mb-0">CTF Profilim</p>
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="{{ url_for('ctf.challenges') }}" class="d-block p-3 border rounded text-center text-decoration-none">
+                                    <i class="fas fa-tasks fa-2x text-success mb-2"></i>
+                                    <p class="mb-0">Görevlere Katıl</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Kurslar Kartı -->
+                    <div class="border rounded p-3 mb-3">
+                        <h5 class="text-primary mb-3"><i class="fas fa-book me-2"></i>Kurslarım</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <a href="{{ url_for('courses.enrolled_courses') }}" class="d-block p-3 border rounded text-center text-decoration-none">
+                                    <i class="fas fa-graduation-cap fa-2x text-info mb-2"></i>
+                                    <p class="mb-0">Kayıtlı Kurslarım</p>
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="{{ url_for('courses.index') }}" class="d-block p-3 border rounded text-center text-decoration-none">
+                                    <i class="fas fa-list fa-2x text-primary mb-2"></i>
+                                    <p class="mb-0">Kurs Kataloğu</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Blog Kartı -->
+                    <div class="border rounded p-3">
+                        <h5 class="text-primary mb-3"><i class="fas fa-blog me-2"></i>Blog Aktivitelerim</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <a href="{{ url_for('blog.my_posts') if current_user.is_member else '#' }}" 
+                                   class="d-block p-3 border rounded text-center text-decoration-none {{ 'disabled text-muted' if not current_user.is_member }}">
+                                    <i class="fas fa-pen-fancy fa-2x {{ 'text-secondary' if not current_user.is_member else 'text-danger' }} mb-2"></i>
+                                    <p class="mb-0">Yazılarım</p>
+                                    {% if not current_user.is_member %}
+                                    <small class="text-muted">(Üyelik gerekli)</small>
+                                    {% endif %}
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="{{ url_for('blog.index') }}" class="d-block p-3 border rounded text-center text-decoration-none">
+                                    <i class="fas fa-book-reader fa-2x text-success mb-2"></i>
+                                    <p class="mb-0">Blog Yazıları</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
