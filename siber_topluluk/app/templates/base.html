@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% if title %}{{ title }} - {% endif %}Siber Topluluk{% endblock %}</title>
+    <title>SAMÜ | SGT </title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAE3UlEQVRYw7WXW2yURRTHf7Pft9vutrttaSnSK5QULHdqNUYgUTHBRDFGEzUGH9DEB42JiYnx7sOLJj74omgQBKPGKwgIGhARQeQu0BZLoZRSets2vWzbbffbc2Z2t9tti/hgkm9nZ2fO+c+ZM/85ZxQpOL3mXYXmcaAc8Juc7cB+4GvgK1A9qX2fao3rge+APwAt5Q4YAD4AKnMN+lKMVwL1gC+N4aQrAErMXMXlGk4nQMrsf9G+5Mm5Z8l+OjcnCAfkKQS0l2tAAXWAOp66Uym1ZVxWmJkPOGZEKh1YECzjnQVrKPXlTXLsm8BlM+JN46vAWWAz8KP+pvHg4Oih7Tua9pIf8LM0r5h7ZizguryZKKUmLcJvevNMlxMFrAVOmL4DOrBmXK0EfgKu1FrXH+s+Q9WZA4TDAV5ccDfLi6/C1dNSl8Qs5C6QCVutDADYNvDhSMJ+Y++JGmzbw9KCWdzqzyfuhNkfOkM46uLqGa4LlKb1e6x5L5n7dKbkdmrb2eXc3/JCpRrsCnZza+0PfNmyhx9a69nQvJM3m36l14nS6ThsaDrEkZE+LNc17caNDGzMZDzVTHgB8n6EwHoV3G3V8QYe7PmLPQPHiLtxbHLwKR8v1n/Pfe0HqOvrQQmNVnC0q5+9HWeIxccJWChSnzHmZdqUkXwg8OA17/QL5/a6JWWFRFyHfcMdaAwKjRUJEFIWb4YP80a8npt8M4kPR9nUfIIdnYPEHEDHwRp7H9aJXkzMOJ5tZqcKoLTbJwS4QcuXVxqIECLuJMZPG1pjoQiBXxmqnXbWdhxgNB7jUP8If7YNEIu7tqXcKLitKMcClUcmrQKSEVB+pbyiQF7IirlDxDQTDVWE0QK0xUd9zVBYwG8dQ+RXTmdGIAjEQA8jGnJdRmQ7XU4GlBUvHusdFRJOkKpQK1p5TLaLsRWWkvYY69r3YgWC/NkzjJtIMi0N0K1kbz9mIpmRbwpNpazSpbs6iWjNnq5G9g11TY4YgMKiLzHKl53HiNsWe9v6cTUkRHREhA6C3nuxcmuLGc5EQDITbXWOxcd6UEAsMcofvSew9IW2SovVU3MrDva2D7OvazhpHD86iHamD2F5p2BN240ZCEhysoIDnSE6RmJ0hUPEEqOTLCgUPleIMDrM773DjMX1eL9IZXTsGaSjiYiAZ2kmCvIoZcWLKkwOQDITHw+2cDLch44JDpqbCov5PovN/a147FEcUVQU5KOUsLrLGPBVUmRXliNNPgkkM6EYPe4dDfTF3XDUi8eKyPcEmJVXSImlEXeU7mgYL0GCQJ7fh88rFQmLWEIR7P2G0HAtHt9gJgKSB9SbgKJcpKMLcjzhRDhppbC8fsoDRTgRCPlzuDqnmHIVoF8NcCoRQQZpxOnBGW7ldNMnRGNDqEA+lnd61jhgEZI94JgZiN3A08Bt2+a/e0i8BQO6j3OD7YQ8GqkJvCSJE0UyURJjnXRF+kH58QcL2bRJysiMZC4g1E7DkL/ZVHlKTfMVIhIOsaF6R0HCq1ZVQu8Bvg4MMDI6RCjSS3ikh+HwAJGxMHHXxdKaTZs2q0AZsmFZYKp2P0FqnV+SnwsHSpH9jJQs+N32vzwnKqsAGzIvAAAAAElFTkSuQmCC">
     <!-- Google Fonts - Fira Code (Terminal style) -->
@@ -21,7 +21,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-shield-alt me-2"></i>Siber Topluluk
+                <i class="fas fa-shield-alt me-2"></i>SAMÜ SGT
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -158,8 +158,9 @@
             </div>
             <hr class="mt-4 mb-4">
             <div class="text-center">
-                <p class="mb-0"><i class="far fa-copyright me-2"></i>{{ now.year }} Siber Topluluk. Tüm hakları saklıdır.</p>
-                <small class="text-muted cyber-badge mt-2">v1.0 | Güvenli Mod | <span id="current-time"></span></small>
+                <p class="mb-0"><i class="far fa-copyright me-2"></i>{{ now.year }} Samsun Üniversitesi Siber Güvenlik Topluluğu. Tüm hakları saklıdır.</p>
+                <small class="text-info cyber-badge mt-2">v1.0 | Güvenli Mod | <span id="current-time"></span></small>
+                <p class="badge">created by @beyazskorsy</p>
             </div>
         </div>
     </footer>
